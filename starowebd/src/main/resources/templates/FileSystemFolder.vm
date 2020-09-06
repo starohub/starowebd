@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+#if ($uri == "")
+	<title>[ / ] | StaroWebD</title>
+#else
+	<title>[ $uri ] | StaroWebD</title>
+#end
+
+	<link rel="icon" href="/images/favicon.png" />
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="/scripts/jquery.min.js"></script>
+	
+	<!-- Bootstrap -->
+	<script src="/scripts/bootstrap.min.js"></script>
+	<link href="/styles/bootstrap.min.css" rel="stylesheet">
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	<!-- Common -->
+	<link href="/styles/common.css" rel="stylesheet">
+	<script>
+	</script>
+    <style>
+body {
+    margin: 10px;
+}
+    </style>
+</head>
+<body>
+
+    <div class="panel panel-primary" style="border-color: #e9117c !important;">
+        <div class="panel-heading" style="border-color: #e9117c !important;padding: 0px !important; background-color: #e9117c !important;"><img src="/images/banner.png" style="height: 32px; padding: 5px; background-color: white; border-radius: 3px;" /></div>
+        <div class="panel-body" style="border-color: #e9117c !important;">
+<table class="table table-striped" style="width: 100%">
+<thead>
+    <th>Name</th>
+    <th>Type</th>
+</thead>
+<tbody>
+#foreach ($rw in $items)
+<tr>
+    <td>
+#if ($rw.kind() == "current")
+    #if ($uri == "")
+        <a href="/">$rw.name()</a>
+    #else
+        <a href="/$uri">$rw.name()</a>
+    #end
+#end
+#if ($rw.kind() == "parent")
+    #if ($uri == "")
+        <a href="/">$rw.name()</a>
+    #else
+        <a href="/$uri/../">$rw.name()</a>
+    #end
+#end
+#if ($rw.kind() == "folder")
+    #if ($uri == "")
+        <a href="/$rw.name()">$rw.name()</a>
+    #else
+        <a href="/$uri/$rw.name()">$rw.name()</a>
+    #end
+#end
+#if ($rw.kind() == "file")
+    #if ($uri == "")
+        <a href="/$rw.name()">$rw.name()</a>
+    #else
+        <a href="/$uri/$rw.name()">$rw.name()</a>
+    #end
+#end
+    </td>
+    <td>
+#if ($rw.kind() == "current")
+        CURRENT
+#end
+#if ($rw.kind() == "parent")
+        PARENT
+#end
+#if ($rw.kind() == "folder")
+        FOLDER
+#end
+#if ($rw.kind() == "file")
+        <span>$rw.mime()</span>
+#end
+    </td>
+#end
+</tr>
+</tbody>
+</table>
+        </div>
+    </div>
+
+</script>
+</body>
+</html>

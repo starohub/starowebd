@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="starowebd.jar">
+    <output-path>$PROJECT_DIR$/pub</output-path>
+    <root id="archive" name="starowebd.jar">
+      <element id="module-output" name="starowebd" />
+    </root>
+  </artifact>
+</component>
