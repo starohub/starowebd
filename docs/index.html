@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>StaroWebD - Staro Micro Web Server</title>
+		
+	<link rel="icon" href="/rsx/images/favicon.png" />
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="/rsx/scripts/jquery.min.js"></script>
+	
+	<!-- Bootstrap -->
+	<script src="/rsx/scripts/bootstrap.min.js"></script>
+	<link href="/rsx/styles/bootstrap.min.css" rel="stylesheet">
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	<!-- Common -->
+	<link href="/rsx/styles/common.css" rel="stylesheet">
+	<script>
+	</script>
+    <style>
+body {
+    margin: 0px;
+	padding: 0px;
+}
+
+#panel .panel-heading a {
+	color: white !important;
+}
+    </style>
+	<script>
+$(document).ready(function() {
+	$(window).resize(function() {
+		resize();
+	});
+	resize();
+	location = 'https://github.com/starohub/starowebd';
+});
+
+function resize() {
+	var wh = $(window).height();
+	var root = $('#root');
+	var panel = $('#root');
+	var frame = $('#frame');
+	var cover = $('#cover');
+
+	root.height(wh - 10);
+	panel.height(root.height());
+	cover.height(root.height() - root.find('.panel-heading').height() - 5);
+	frame.width(cover.width());
+	frame.height(cover.height());
+}
+	</script>
+</head>
+<body>
+	<div id="root" style="position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; padding: 5px;">
+
+		<div id="panel" class="panel panel-primary" style="border-color: #e9117c !important;">
+			<div class="panel-heading" style="border-color: #e9117c !important;padding: 0px !important; background-color: #e9117c !important;">
+				<img src="/rsx/images/starowebd-42.png" style="height: 32px; padding: 5px; background-color: white; border-radius: 3px;" />
+				<span style="margin-left: 10px">
+					<a href="/index.html">Home</a>
+					&nbsp; | &nbsp;
+					<a href="/api.html">JSB API</a>
+					&nbsp; | &nbsp;
+					<a href="/xapi.html">JSX API</a>
+				</span>
+			</div>
+			<div class="panel-body" style="border-color: #e9117c !important; padding: 1px;" id="cover">
+			</div>
+		</div>
+
+	</div>
+</script>
+</body>
+</html>
