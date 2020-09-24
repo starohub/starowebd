@@ -36,18 +36,26 @@ package com.starohub.webd.sandbox;
 
 import jsb.SMachine;
 import jsb.SPackageStore;
+import jsx.webd.Config;
+import jsx.webd.WebDApi;
+
+import java.util.Map;
 
 public class WebDMod extends jsb.SModule {
-    private com.starohub.webd.Config _webConfig;
-    public com.starohub.webd.Config webConfig() { return _webConfig; }
+    private WebDApi _api;
 
-    public WebDMod(SMachine machine, com.starohub.webd.Config webConfig) {
-        super(machine);
-        _webConfig = webConfig;
+    public WebDMod(WebDApi api, SMachine machine, Map more) {
+        super(machine, more);
+        _api = api;
     }
 
-    protected SPackageStore createPackages() {
-        return new WebDPackageStore(this.machine(), DefaultSandbox.WEB_CONFIG);
+    protected WebDApi api() {
+        return _api;
+    }
+
+    @Override
+    protected SPackageStore createPackages(Map more) {
+        return new WebDPackageStore((WebDApi)more.get("api"), this.machine(), more);
     }
 
     public boolean visibleToScripts(String className) {

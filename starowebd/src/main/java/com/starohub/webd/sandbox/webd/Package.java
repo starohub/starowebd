@@ -35,108 +35,20 @@
 package com.starohub.webd.sandbox.webd;
 
 import jsb.SMachine;
-import com.starohub.webd.FileItem;
-import com.starohub.webd.Tool;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
+import jsb.webd.SBluePrint;
+import jsb.webd.SPackage;
+import jsx.webd.BluePrint;
+import jsx.webd.WebDApi;
 
-import java.io.FileInputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class Package extends jsb.SPackage {
-    private com.starohub.webd.Config _webConfig;
-    public com.starohub.webd.Config webConfig() { return _webConfig; }
-
-    public Package(SMachine machine, com.starohub.webd.Config webConfig) {
-        super(machine);
-        _webConfig = webConfig;
+public class Package extends jsb.webd.SPackage {
+    public Package(WebDApi api, SMachine machine, Map more) {
+        super(api, machine, more);
     }
 
-    public void theme(Map outputMap, String uri, Map args) throws Exception {
-        outputMap.put("_return_html", merge(template(uri), args));
-    }
-
-    public String template(String uri) throws Exception {
-        FileItem webDir = new FileItem(webConfig().dataFolder());
-        FileItem item = new FileItem(webDir.filepath(), uri);
-        if (item.kind().equalsIgnoreCase("file")) {
-            FileInputStream fis = new FileInputStream(item.filepath());
-            byte[] buffer = new byte[fis.available()];
-            fis.read(buffer);
-            fis.close();
-            String tpl = new String(buffer, "UTF-8");
-            return tpl;
-        } else {
-            return "";
-        }
-    }
-
-    public String merge(String template, Map args) throws Exception {
-        VelocityEngine engine = new VelocityEngine();
-        engine.init();
-        VelocityContext ctx = new VelocityContext();
-        for (Object key : args.keySet()) {
-            ctx.put(key + "", args.get(key));
-        }
-        Writer writer = new StringWriter();
-        engine.evaluate(ctx, writer, "", template);
-        return writer.toString();
-    }
-
-    public Map<String, String> getQueryMap(final com.starohub.webd.IHTTPSession session) throws Exception {
-        return session.getParms();
-    }
-
-    public Map<String, String> postQueryMap(final com.starohub.webd.IHTTPSession session) throws Exception {
-        Map<String, String> files = new HashMap<String, String>();
-        session.parseBody(files);
-        return session.getParms();
-    }
-
-    public  Map postJsonMap(final com.starohub.webd.IHTTPSession session) throws Exception {
-        Map<String, String> files = new HashMap<String, String>();
-        session.parseBody(files);
-        return Tool.jsonToMap(files.get("postData") + "");
-    }
-
-    public String stringParam(Map<String, String> params, String key, String defaultValue) {
-        String target = defaultValue;
-        if (params.containsKey(key)) {
-            target = params.get(key);
-        }
-        return target;
-    }
-
-    public List<String> stringListParam(Map<String, String> params, String key) {
-        if (params.containsKey(key)) {
-            String[] paramArray = params.get(key).split("~");
-            List<String> target = new ArrayList<>();
-            for (int i = 0; i < paramArray.length; i++) {
-                target.add(paramArray[i]);
-            }
-            return target;
-        }
-        return new ArrayList<>();
-    }
-
-    public int intParam(Map<String, String> params, String key, int defaultValue) {
-        int target = defaultValue;
-        if (params.containsKey(key)) {
-            target = Integer.parseInt(params.get(key));
-        }
-        return target;
-    }
-
-    public long longParam(Map<String, String> params, String key, long defaultValue) {
-        long target = defaultValue;
-        if (params.containsKey(key)) {
-            target = Long.parseLong(params.get(key));
-        }
-        return target;
+    @Override
+    protected SBluePrint createBluePrint(SPackage pkg, WebDApi api, BluePrint blueprint) {
+        return new DefaultBluePrint(pkg, api, blueprint);
     }
 }

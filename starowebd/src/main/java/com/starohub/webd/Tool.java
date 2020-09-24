@@ -78,6 +78,7 @@
 package com.starohub.webd;
 
 import com.starohub.platies.Platies;
+import jsx.webd.PageResponse;
 
 import javax.net.ssl.*;
 import java.io.*;
@@ -350,10 +351,15 @@ public class Tool {
 
     public static String readText(String filename) throws Exception {
         FileInputStream fis = new FileInputStream(filename);
-        byte[] buffer = new byte[fis.available()];
-        fis.read(buffer);
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int read = fis.read(buffer, 0, buffer.length);
+        while (read > 0) {
+            baos.write(buffer, 0, read);
+            read = fis.read(buffer, 0, buffer.length);
+        }
         fis.close();
-        return new String(buffer, "UTF-8");
+        return new String(baos.toByteArray(), "UTF-8");
     }
 
     public static byte[] loadResource(String path) {

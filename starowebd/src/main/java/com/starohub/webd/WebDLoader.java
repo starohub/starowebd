@@ -34,23 +34,23 @@
 
 package com.starohub.webd;
 
+import jsx.webd.Config;
+import jsx.webd.WebDApi;
+
 import java.io.File;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 public class WebDLoader {
     private static WebDLoader __instance = null;
-    public static WebDLoader instance() {
-        return __instance;
-    }
 
-    private static final int DEFAULT_PORT = 1103;
     private static final int MAX_PORT = 9999;
 
     private WebD _api = null;
     private Config _config;
+    private boolean _stopped = false;
+    private boolean _exitOnStop = true;
+    private boolean _reuseApi = false;
 
     public static void main(String[] args) {
         try {
@@ -60,6 +60,7 @@ public class WebDLoader {
                 String cfgFile = args[0];
                 String json = Tool.readText(cfgFile);
                 Map cfgMap = Tool.jsonToMap(json);
+                Map more = Tool.mapItemToMap(cfgMap, "more");
                 Config cfg = new Config();
                 if (cfgMap.containsKey("dataFolder")) {
                     cfg.dataFolder(cfgMap.get("dataFolder").toString());
@@ -116,7 +117,18 @@ public class WebDLoader {
                 } else {
                     cfg.apiPort(1103);
                 }
-                new WebDLoader(cfg);
+                if (cfgMap.containsKey("blueprintClass")) {
+                    cfg.blueprintClass(cfgMap.get("blueprintClass") + "");
+                }
+                if (cfgMap.containsKey("blueprintLicense")) {
+                    cfg.blueprintLicense(cfgMap.get("blueprintLicense") + "");
+                }
+                if (args.length >= 3) {
+                    cfg.blueprintClass(args[1]);
+                    cfg.blueprintLicense(args[2]);
+                }
+                cfg.more(more);
+                new WebDLoader(cfg).startup();
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -125,9 +137,11 @@ public class WebDLoader {
 
     public static void help() {
         String line = "Syntax:\n"
-                + "    starowebd <configFile>\n"
+                + "    starowebd <configFile> [<BluePrintClass> <BluePrintLicenseFile>]\n"
                 + "  where:\n"
                 + "    <configFile>: JSON file contains configuration."
+                + "    <BluePrintClass>: class name of blue print. List of required jar files is set in %STARO_WEBD_BLUE_PRINT% environment variable."
+                + "    <BluePrintLicenseFile>: license file of specified blue print."
                 + "\n"
                 ;
 
@@ -135,9 +149,34 @@ public class WebDLoader {
     }
 
     public WebDLoader(Config config) {
-        __instance = this;
         _config = config;
-        startup(_config);
+    }
+
+    public boolean reuseApi() {
+        return _reuseApi;
+    }
+
+    public WebDLoader reuseApi(boolean src) {
+        _reuseApi = src;
+        return this;
+    }
+
+    public boolean stopped() {
+        return _stopped;
+    }
+
+    public WebDLoader stopped(boolean src) {
+        _stopped = src;
+        return this;
+    }
+
+    public boolean exitOnStop() {
+        return _exitOnStop;
+    }
+
+    public WebDLoader exitOnStop(boolean src) {
+        _exitOnStop = src;
+        return this;
     }
 
     public String dataFolder() { return _config.dataFolder(); }
@@ -146,36 +185,56 @@ public class WebDLoader {
         return _api;
     }
 
-    public WebD createAPI(Config config) {
-        return new WebDApi(config);
+    public WebD createAPI(Config config, Map more) {
+        return new WebDApi(config, more);
     }
 
-    public void startup(Config cfg) {
+    public void startup() {
+        startup(_config);
+    }
+
+    private void startup(Config cfg) {
         try {
-            int port = DEFAULT_PORT;
+            int port = cfg.apiPort();
 
-            _api = null;
-            while (port <= MAX_PORT) {
-                try {
-                    Tool.LOG.warning("Starting StaroWebD on [ " + cfg.apiPort() + " ] port ...");
-                    _api = createAPI(cfg);
-                    _api.start();
-                    Tool.LOG.warning("Started StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+            _stopped = false;
+            if (reuseApi() && _api != null) {
+                Tool.LOG.warning("Starting StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+                cfg.platform().log("Starting StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+                _api.start();
+                Tool.LOG.warning("Started StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+                cfg.platform().log("Started StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+            } else {
+                _api = null;
+                while (port <= MAX_PORT) {
+                    try {
+                        Tool.LOG.warning("Starting StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+                        cfg.platform().log("Starting StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+                        _api = createAPI(cfg, cfg.more());
+                        _api.start();
+                        Tool.LOG.warning("Started StaroWebD on [ " + cfg.apiPort() + " ] port ...");
+                        cfg.platform().log("Started StaroWebD on [ " + cfg.apiPort() + " ] port ...");
 
-                    break;
-                } catch (Exception e) {
-                    Tool.LOG.log(Level.SEVERE, "Failed to start StaroWebD on port [ " + port + " ] ...");
-                    port++;
-                    cfg.apiPort(port);
+                        break;
+                    } catch (Exception e) {
+                        Tool.LOG.log(Level.SEVERE, "Failed to start StaroWebD on port [ " + port + " ] ...");
+                        cfg.platform().log("Failed to start StaroWebD on port [ " + port + " ] ...");
+                        port++;
+                        cfg.apiPort(port);
+                    }
                 }
             }
 
-            while (_api.isAlive()) {
+            while (_api.isAlive() && !_stopped) {
                 try {
                     File stopSignalFile = new File(cfg.stopSignalFile());
                     if (stopSignalFile.exists()) {
-                        List<String> lines = Files.readAllLines(stopSignalFile.toPath());
-                        if (lines.size() > 0 && ("stop".equalsIgnoreCase(lines.get(0)) || "yes".equalsIgnoreCase(lines.get(0)))) {
+                        String input = "\n\n";
+                        try {
+                            input = Tool.readText(stopSignalFile.getAbsolutePath());
+                        } catch (Throwable e) {}
+                        String[] lines = input.split("\n");
+                        if (lines.length > 0 && ("stop".equalsIgnoreCase(lines[0].trim()) || "yes".equalsIgnoreCase(lines[0].trim()))) {
                             break;
                         }
                     }
@@ -184,9 +243,23 @@ public class WebDLoader {
                 }
                 Thread.sleep(1000);
             }
-            System.exit(0);
+            if (_stopped) {
+                try {
+                    _api.stop();
+                } catch (Throwable e) {
+                    Tool.LOG.log(Level.SEVERE, "Failed: ", e);
+                    cfg.platform().log("Failed: " + Tool.stacktrace(e));
+                }
+            }
+
+            if (exitOnStop()) {
+                Tool.LOG.log(Level.SEVERE, "Exit StaroWebD on port [ " + cfg.apiPort() + " ] ...");
+                cfg.platform().log("Exit StaroWebD on port [ " + cfg.apiPort() + " ] ...");
+                System.exit(0);
+            }
         } catch (Throwable t) {
             Tool.LOG.log(Level.SEVERE, "Failed: ", t);
+            cfg.platform().log("Failed: " + Tool.stacktrace(t));
         }
     }
 }

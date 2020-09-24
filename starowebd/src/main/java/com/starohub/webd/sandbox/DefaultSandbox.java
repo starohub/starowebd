@@ -34,34 +34,54 @@
 
 package com.starohub.webd.sandbox;
 
+import com.starohub.webd.WebD;
 import jsb.SMachine;
+import jsx.webd.Config;
+import jsx.webd.WebDApi;
+
+import java.util.Map;
 
 public class DefaultSandbox extends com.starohub.jsb.Sandbox {
-    public static com.starohub.webd.Config WEB_CONFIG;
-    private com.starohub.webd.Config _webConfig;
-    public com.starohub.webd.Config webConfig() { return _webConfig; }
+    private WebDApi _api;
 
-    public DefaultSandbox(String javascript, int timeout, com.starohub.webd.Config webConfig) {
-        super(javascript, timeout, webConfig.dataFolder(), webConfig.cfgReadonly(), webConfig.cfgWritable(), webConfig.cfgMounter());
-        _webConfig = webConfig;
-        WEB_CONFIG = _webConfig;
+    public DefaultSandbox(String javascript, int timeout, WebDApi api, Map more) {
+        super(javascript, timeout, api.config().dataFolder(), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
+        _api = api;
     }
 
     @Override
     protected boolean customVisibleToScripts(String className) {
         if ("com.starohub.webd.sandbox.WebDMod".equals(className)) return true;
         if ("com.starohub.webd.sandbox.DefaultMachine".equals(className)) return true;
-        if ("com.starohub.webd.IHTTPSession".equals(className)) return true;
-        if ("com.starohub.webd.HTTPSession".equals(className)) return true;
+        if ("jsb.webd.SPackage".equals(className)) return true;
+        if ("jsb.webd.SSession".equals(className)) return true;
+        if ("jsb.webd.SBluePrint".equals(className)) return true;
+        if ("jsb.webd.SArtWork".equals(className)) return true;
+        if ("jsb.webd.SDataSet".equals(className)) return true;
+        if (pkg().blueprint().available()) {
+            if (pkg().blueprint().visibleToScripts(className)) return true;
+        }
         return false;
+    }
+
+    protected WebDMod mod() {
+        return (WebDMod)machine().mod("webd");
+    }
+
+    protected jsb.webd.SPackage pkg() {
+        return (jsb.webd.SPackage)mod().pkg("webd");
     }
 
     @Override
     protected boolean customInvisibleToScripts(String className) {
+        if (pkg().blueprint().available()) {
+            if (pkg().blueprint().invisibleToScripts(className)) return true;
+        }
         return false;
     }
 
-    protected SMachine createMachine() {
-        return new DefaultMachine(DefaultSandbox.WEB_CONFIG);
+    @Override
+    protected SMachine createMachine(Map more) {
+        return new DefaultMachine((WebDApi)more.get("api"), more);
     }
 }

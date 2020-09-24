@@ -36,18 +36,25 @@ package com.starohub.webd.sandbox;
 
 import jsb.SMachine;
 import jsb.SPackageStore;
+import jsx.webd.WebDApi;
+
+import java.util.Map;
 
 public class WebDPackageStore extends jsb.SPackageStore {
-    private com.starohub.webd.Config _webConfig;
-    public com.starohub.webd.Config webConfig() { return _webConfig; }
+    private WebDApi _api;
 
-    public WebDPackageStore(SMachine machine, com.starohub.webd.Config webConfig) {
-        super(machine);
-        _webConfig = webConfig;
+    public WebDPackageStore(WebDApi api, SMachine machine, Map more) {
+        super(machine, more);
+        _api = api;
     }
 
-    protected SPackageStore setStore() {
-        pkg("webd", new com.starohub.webd.sandbox.webd.Package(this.machine(), DefaultSandbox.WEB_CONFIG));
+    protected WebDApi api() {
+        return _api;
+    }
+
+    @Override
+    protected SPackageStore setStore(Map more) {
+        pkg("webd", new com.starohub.webd.sandbox.webd.Package((WebDApi)more.get("api"), this.machine(), more));
         return this;
     }
 }

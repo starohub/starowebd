@@ -1,0 +1,463 @@
+
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:154)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EvaluatorException: Access to Java class "com.starohub.trial.plugin.Module" is prohibited. (<js>#107)
+	at com.starohub.discus.DefaultErrorReporter.runtimeError(DefaultErrorReporter.java:118)
+	at com.starohub.discus.Context.reportRuntimeError(Context.java:955)
+	at com.starohub.discus.Context.reportRuntimeError(Context.java:1010)
+	at com.starohub.discus.Context.reportRuntimeError1(Context.java:973)
+	at com.starohub.discus.JavaMembers.<init>(JavaMembers.java:77)
+	at com.starohub.discus.JavaMembers.lookupClass(JavaMembers.java:856)
+	at com.starohub.discus.NativeJavaObject.initMembers(NativeJavaObject.java:99)
+	at com.starohub.discus.NativeJavaObject.<init>(NativeJavaObject.java:89)
+	at com.starohub.discus.NativeJavaObject.<init>(NativeJavaObject.java:79)
+	at com.starohub.discus.WrapFactory.wrapAsJavaObject(WrapFactory.java:157)
+	at com.starohub.discus.WrapFactory.wrap(WrapFactory.java:114)
+	at com.starohub.discus.NativeJavaMethod.call(NativeJavaMethod.java:267)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1710)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:154)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EcmaError: TypeError: Cannot find function puk in object {name=John}. (<js>#172)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3794)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3772)
+	at com.starohub.discus.ScriptRuntime.typeError(ScriptRuntime.java:3800)
+	at com.starohub.discus.ScriptRuntime.typeError2(ScriptRuntime.java:3819)
+	at com.starohub.discus.ScriptRuntime.notFunctionError(ScriptRuntime.java:3890)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2369)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2336)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1523)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+java.lang.NoSuchMethodException: com.starohub.trial.artwork.ArtWork.<init>(com.starohub.trial.blueprint.BluePrint)
+	at java.lang.Class.getConstructor0(Class.java:3082)
+	at java.lang.Class.getConstructor(Class.java:1825)
+	at jsx.webd.BluePrint.createArtWorkMap(BluePrint.java:155)
+	at jsx.webd.BluePrint.<init>(BluePrint.java:63)
+	at com.starohub.trial.blueprint.BluePrint.<init>(BluePrint.java:13)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at jsx.webd.WebDApi.createBlueprint(WebDApi.java:94)
+	at jsx.webd.WebDApi.initialize(WebDApi.java:78)
+	at jsx.webd.WebDApi.<init>(WebDApi.java:70)
+	at com.starohub.webd.WebDLoader.createAPI(WebDLoader.java:193)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:217)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:197)
+	at com.starohub.webd.WebDLoader.main(WebDLoader.java:134)
+
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+java.lang.NoSuchMethodException: com.starohub.trial.artwork.ArtWork.<init>(com.starohub.trial.blueprint.BluePrint)
+	at java.lang.Class.getConstructor0(Class.java:3082)
+	at java.lang.Class.getConstructor(Class.java:1825)
+	at jsx.webd.BluePrint.createArtWorkMap(BluePrint.java:155)
+	at jsx.webd.BluePrint.<init>(BluePrint.java:63)
+	at com.starohub.trial.blueprint.BluePrint.<init>(BluePrint.java:13)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at jsx.webd.WebDApi.createBlueprint(WebDApi.java:94)
+	at jsx.webd.WebDApi.initialize(WebDApi.java:78)
+	at jsx.webd.WebDApi.<init>(WebDApi.java:70)
+	at com.starohub.webd.WebDLoader.createAPI(WebDLoader.java:193)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:217)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:197)
+	at com.starohub.webd.WebDLoader.main(WebDLoader.java:134)
+
+Started StaroWebD on [ 1103 ] port ...
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:162)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EcmaError: TypeError: Cannot find function blueprint in object com.starohub.webd.sandbox.WebDMod@46a3be13. (<js>#172)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3794)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3772)
+	at com.starohub.discus.ScriptRuntime.typeError(ScriptRuntime.java:3800)
+	at com.starohub.discus.ScriptRuntime.typeError2(ScriptRuntime.java:3819)
+	at com.starohub.discus.ScriptRuntime.notFunctionError(ScriptRuntime.java:3890)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2369)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2336)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1523)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:162)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EcmaError: TypeError: Cannot find function artwork in object com.starohub.webd.sandbox.webd.DefaultBluePrint@367b82a5. (<js>#172)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3794)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3772)
+	at com.starohub.discus.ScriptRuntime.typeError(ScriptRuntime.java:3800)
+	at com.starohub.discus.ScriptRuntime.typeError2(ScriptRuntime.java:3819)
+	at com.starohub.discus.ScriptRuntime.notFunctionError(ScriptRuntime.java:3890)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2369)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2336)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1523)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:162)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EcmaError: TypeError: Cannot call method "mergeHtml" of null (<js>#173)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3794)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3772)
+	at com.starohub.discus.ScriptRuntime.typeError(ScriptRuntime.java:3800)
+	at com.starohub.discus.ScriptRuntime.typeError2(ScriptRuntime.java:3819)
+	at com.starohub.discus.ScriptRuntime.undefCallError(ScriptRuntime.java:3838)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2343)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2336)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1523)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Starting StaroWebD on [ 1103 ] port ...
+java.lang.NoSuchMethodException: com.starohub.trial.artwork.ArtWork.<init>(com.starohub.trial.blueprint.BluePrint)
+	at java.lang.Class.getConstructor0(Class.java:3082)
+	at java.lang.Class.getConstructor(Class.java:1825)
+	at jsx.webd.BluePrint.createArtWorkMap(BluePrint.java:155)
+	at jsx.webd.BluePrint.<init>(BluePrint.java:63)
+	at com.starohub.trial.blueprint.BluePrint.<init>(BluePrint.java:13)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at jsx.webd.WebDApi.createBlueprint(WebDApi.java:94)
+	at jsx.webd.WebDApi.initialize(WebDApi.java:78)
+	at jsx.webd.WebDApi.<init>(WebDApi.java:70)
+	at com.starohub.webd.WebDLoader.createAPI(WebDLoader.java:193)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:217)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:197)
+	at com.starohub.webd.WebDLoader.main(WebDLoader.java:134)
+
+Started StaroWebD on [ 1103 ] port ...
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:162)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EcmaError: TypeError: Cannot call method "mergeHtml" of null (<js>#173)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3794)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3772)
+	at com.starohub.discus.ScriptRuntime.typeError(ScriptRuntime.java:3800)
+	at com.starohub.discus.ScriptRuntime.typeError2(ScriptRuntime.java:3819)
+	at com.starohub.discus.ScriptRuntime.undefCallError(ScriptRuntime.java:3838)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2343)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2336)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1523)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Starting StaroWebD on [ 1103 ] port ...
+java.lang.NoSuchMethodException: com.starohub.trial.artwork.ArtWork.<init>(com.starohub.trial.blueprint.BluePrint)
+	at java.lang.Class.getConstructor0(Class.java:3082)
+	at java.lang.Class.getConstructor(Class.java:1825)
+	at jsx.webd.BluePrint.createArtWorkMap(BluePrint.java:158)
+	at jsx.webd.BluePrint.<init>(BluePrint.java:63)
+	at com.starohub.trial.blueprint.BluePrint.<init>(BluePrint.java:13)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at jsx.webd.WebDApi.createBlueprint(WebDApi.java:94)
+	at jsx.webd.WebDApi.initialize(WebDApi.java:78)
+	at jsx.webd.WebDApi.<init>(WebDApi.java:70)
+	at com.starohub.webd.WebDLoader.createAPI(WebDLoader.java:193)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:217)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:197)
+	at com.starohub.webd.WebDLoader.main(WebDLoader.java:134)
+
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+java.lang.NoSuchMethodException: com.starohub.trial.artwork.ArtWork.<init>(com.starohub.trial.blueprint.BluePrint)
+	at java.lang.Class.getConstructor0(Class.java:3082)
+	at java.lang.Class.getConstructor(Class.java:1825)
+	at jsx.webd.BluePrint.createArtWorkMap(BluePrint.java:161)
+	at jsx.webd.BluePrint.<init>(BluePrint.java:63)
+	at com.starohub.trial.blueprint.BluePrint.<init>(BluePrint.java:13)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at jsx.webd.WebDApi.createBlueprint(WebDApi.java:94)
+	at jsx.webd.WebDApi.initialize(WebDApi.java:78)
+	at jsx.webd.WebDApi.<init>(WebDApi.java:70)
+	at com.starohub.webd.WebDLoader.createAPI(WebDLoader.java:193)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:217)
+	at com.starohub.webd.WebDLoader.startup(WebDLoader.java:197)
+	at com.starohub.webd.WebDLoader.main(WebDLoader.java:134)
+
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Failed to load artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork): Invalid license ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Failed to load artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork): Invalid license ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Failed to load artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork): Invalid license ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Failed to load artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork): Invalid license ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Starting StaroWebD on [ 1103 ] port ...
+Loaded kernel [com.starohub.trial.kernel] (Staro Trial - Kernel) ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:162)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EcmaError: TypeError: Cannot find function currentTime in object com.starohub.webd.sandbox.webd.DefaultKernel@a379a57. (<js>#168)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3794)
+	at com.starohub.discus.ScriptRuntime.constructError(ScriptRuntime.java:3772)
+	at com.starohub.discus.ScriptRuntime.typeError(ScriptRuntime.java:3800)
+	at com.starohub.discus.ScriptRuntime.typeError2(ScriptRuntime.java:3819)
+	at com.starohub.discus.ScriptRuntime.notFunctionError(ScriptRuntime.java:3890)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThisHelper(ScriptRuntime.java:2369)
+	at com.starohub.discus.ScriptRuntime.getPropFunctionAndThis(ScriptRuntime.java:2336)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1523)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Starting StaroWebD on [ 1103 ] port ...
+Loaded kernel [com.starohub.trial.kernel] (Staro Trial - Kernel) ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...
+Failed to view page: jsb.io.SException
+	at jsb.io.Package.newException(Package.java:94)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:287)
+	at com.starohub.jsb.SBObject.exec(SBObject.java:160)
+	at jsx.webd.defaultpages.DefaultFileSystemPage.run(DefaultFileSystemPage.java:124)
+	at jsx.webd.PageFactory.run(PageFactory.java:125)
+	at jsx.webd.WebDApi.serve(WebDApi.java:162)
+	at com.starohub.webd.HTTPSession.execute(HTTPSession.java:353)
+	at com.starohub.webd.ClientHandler.run(ClientHandler.java:75)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.starohub.discus.EvaluatorException: Access to Java class "jsb.trial.kernel.Kernel" is prohibited. (<js>#167)
+	at com.starohub.discus.DefaultErrorReporter.runtimeError(DefaultErrorReporter.java:118)
+	at com.starohub.discus.Context.reportRuntimeError(Context.java:955)
+	at com.starohub.discus.Context.reportRuntimeError(Context.java:1010)
+	at com.starohub.discus.Context.reportRuntimeError1(Context.java:973)
+	at com.starohub.discus.JavaMembers.<init>(JavaMembers.java:77)
+	at com.starohub.discus.JavaMembers.lookupClass(JavaMembers.java:856)
+	at com.starohub.discus.NativeJavaObject.initMembers(NativeJavaObject.java:99)
+	at com.starohub.discus.NativeJavaObject.<init>(NativeJavaObject.java:89)
+	at com.starohub.discus.NativeJavaObject.<init>(NativeJavaObject.java:79)
+	at com.starohub.discus.WrapFactory.wrapAsJavaObject(WrapFactory.java:157)
+	at com.starohub.discus.WrapFactory.wrap(WrapFactory.java:114)
+	at com.starohub.discus.NativeJavaMethod.call(NativeJavaMethod.java:267)
+	at com.starohub.discus.Interpreter.interpretLoop(Interpreter.java:1710)
+	at com.starohub.discus.Interpreter.interpret(Interpreter.java:863)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:173)
+	at com.starohub.discus.ContextFactory.doTopCall(ContextFactory.java:435)
+	at com.starohub.jsb.Sandbox$SFactory.doTopCall(Sandbox.java:349)
+	at com.starohub.discus.ScriptRuntime.doTopCall(ScriptRuntime.java:3187)
+	at com.starohub.discus.InterpretedFunction.call(InterpretedFunction.java:171)
+	at com.starohub.jsb.Sandbox.call(Sandbox.java:282)
+	... 11 more
+
+Starting StaroWebD on [ 1103 ] port ...
+Loaded kernel [com.starohub.trial.kernel] (Staro Trial - Kernel) ...
+Loaded artwork [com.starohub.trial.artwork] (Staro Trial - ArtWork) ...
+Loaded dataset [com.starohub.trial.dataset] (Staro Trial - DataSet) ...
+Started StaroWebD on [ 1103 ] port ...

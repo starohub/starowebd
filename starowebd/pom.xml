@@ -6,7 +6,7 @@
 
     <groupId>com.starohub.webd</groupId>
     <artifactId>starowebd</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,20 +33,50 @@
             <systemPath>${project.basedir}/lib/starodiscus.jar</systemPath>
         </dependency>
 
-        <!-- https://github.com/starohub/starojsb/releases/tag/0.1.9 -->
+        <!-- https://github.com/starohub/starojsb/releases/tag/0.1.11 -->
         <dependency>
             <groupId>com.starohub.jsb</groupId>
             <artifactId>starojsb</artifactId>
-            <version>0.1.9</version>
+            <version>0.1.11</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/starojsb.jar</systemPath>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity -->
+        <!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity-engine-core -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/velocity-engine-core-2.1.jar</systemPath>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.8.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/commons-lang3-3.8.1.jar</systemPath>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.26</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/slf4j-api-1.7.26.jar</systemPath>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.26</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/slf4j-simple-1.7.26.jar</systemPath>
+        </dependency>
+
     </dependencies>
 </project>

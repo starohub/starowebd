@@ -35,20 +35,18 @@
 package com.starohub.webd.sandbox;
 
 import com.starohub.jsb.Sandbox;
+import jsx.webd.Config;
+import jsx.webd.WebDApi;
+
+import java.util.Map;
 
 public class DefaultSBObject extends com.starohub.jsb.SBObject {
-    public static com.starohub.webd.Config WEB_CONFIG;
-    private com.starohub.webd.Config _webConfig;
-    public com.starohub.webd.Config webConfig() { return _webConfig; }
-
-    public DefaultSBObject(String javascript, int timeout, com.starohub.webd.Config webConfig) {
-        super(javascript, timeout, webConfig.dataFolder(), webConfig.cfgReadonly(), webConfig.cfgWritable(), webConfig.cfgMounter());
-        _webConfig = webConfig;
-        WEB_CONFIG = webConfig;
+    public DefaultSBObject(String javascript, int timeout, WebDApi api, Map more) {
+        super(javascript, timeout, api.config().dataFolder(), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
     }
 
     @Override
-    protected Sandbox createSandbox(String javascript, int timeout, String cfgJsonReadonly, String cfgJsonWritable, String cfgJsonMounter) {
-        return new DefaultSandbox(createBaseJS() + "\n\n" + javascript, timeout, DefaultSBObject.WEB_CONFIG);
+    protected Sandbox createSandbox(String javascript, int timeout, String cfgJsonReadonly, String cfgJsonWritable, String cfgJsonMounter, Map more) {
+        return new DefaultSandbox(createBaseJS() + "\n\n" + javascript, timeout, (WebDApi)more.get("api"), more);
     }
 }
