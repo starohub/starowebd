@@ -2,6 +2,12 @@
 
 # Staro Micro Web Server
 
+### Documents
+
+[API for JavaScript](http://webd.starohub.com/api.html)
+
+[API for module building](http://webd.starohub.com/xapi.html)
+
 ### Release
 
 [Release 0.1.5](https://github.com/starohub/starowebd/releases/tag/0.1.5)
