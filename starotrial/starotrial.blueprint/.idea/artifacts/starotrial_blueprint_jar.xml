@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="starotrial.blueprint:jar">
+    <output-path>$PROJECT_DIR$/pub</output-path>
+    <root id="archive" name="starotrial.blueprint.jar">
+      <element id="module-output" name="starotrial.blueprint" />
+    </root>
+  </artifact>
+</component>

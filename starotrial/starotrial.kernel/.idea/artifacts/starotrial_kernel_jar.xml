@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="starotrial.kernel:jar">
+    <output-path>$PROJECT_DIR$/pub</output-path>
+    <root id="archive" name="starotrial.kernel.jar">
+      <element id="module-output" name="starotrial.kernel" />
+    </root>
+  </artifact>
+</component>

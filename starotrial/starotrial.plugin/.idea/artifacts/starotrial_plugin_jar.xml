@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="starotrial.plugin:jar">
+    <output-path>$PROJECT_DIR$/pub</output-path>
+    <root id="archive" name="starotrial.plugin.jar">
+      <element id="module-output" name="starotrial.plugin" />
+    </root>
+  </artifact>
+</component>
