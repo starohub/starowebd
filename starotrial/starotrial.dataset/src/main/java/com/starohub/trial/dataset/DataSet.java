@@ -28,6 +28,24 @@ public class DataSet extends jsx.webd.DataSet {
     }
 
     @Override
+    public String jsonData(String uri) throws Exception {
+        String filename = null;
+        if ("/trial/static/jsm-dyna".equalsIgnoreCase(uri)) {
+            filename = "/trial/static/jsm-dyna/data.json";
+        }
+        if (filename == null) return "{}";
+        SFile sfile = blueprint().api().sbObject().sandbox().machine().mnt().newFile(filename);
+        if (sfile.exists()) {
+            try {
+                return new String(sfile.readFile(), "UTF-8");
+            } catch (Throwable e) {
+                throw new Exception("JSON data file is not found: [ " + filename + " ]");
+            }
+        }
+        return "{}";
+    }
+
+    @Override
     protected PSoftware createLicense(BluePrint bluePrint, String licFile) {
         return new License(bluePrint.api().sbObject().sandbox().machine(), licFile, true);
     }
