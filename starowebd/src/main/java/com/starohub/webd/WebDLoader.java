@@ -62,10 +62,19 @@ public class WebDLoader {
                 Map cfgMap = Tool.jsonToMap(json);
                 Map more = Tool.mapItemToMap(cfgMap, "more");
                 Config cfg = new Config();
+                if (cfgMap.containsKey("vhosts")) {
+                    java.util.List srcList = Tool.mapItemToList(cfgMap, "vhosts");
+                    cfg.vhostList().fromList(srcList);
+                }
                 if (cfgMap.containsKey("dataFolder")) {
                     cfg.dataFolder(cfgMap.get("dataFolder").toString());
                 } else {
                     cfg.dataFolder(new File(System.getProperty("user.dir"), "dat").getAbsolutePath());
+                }
+                if (cfgMap.containsKey("hasDefaultIndexPage")) {
+                    cfg.hasDefaultIndexPage(cfgMap.get("hasDefaultIndexPage").equals("on"));
+                } else {
+                    cfg.hasDefaultIndexPage(false);
                 }
                 if (cfgMap.containsKey("hasDefaultHomePage")) {
                     cfg.hasDefaultHomePage(cfgMap.get("hasDefaultHomePage").equals("on"));

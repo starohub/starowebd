@@ -534,7 +534,7 @@ public class HTTPSession implements IHTTPSession {
                 String contentType = "";
                 String contentTypeHeader = this.headers.get("content-type");
 
-                System.out.println("Content-Type: " + contentTypeHeader);
+                //System.out.println("Content-Type: " + contentTypeHeader);
 
                 StringTokenizer st = null;
                 if (contentTypeHeader != null) {
@@ -564,7 +564,7 @@ public class HTTPSession implements IHTTPSession {
                     fbuf.get(postBytes);
                     String postLine = new String(postBytes).trim();
 
-                    System.out.println("PostLine: " + postLine);
+                    //System.out.println("PostLine: " + postLine);
 
                     // Handle application/x-www-form-urlencoded
                     if ("application/x-www-form-urlencoded".equalsIgnoreCase(contentType)) {

@@ -34,16 +34,10 @@
 
 package jsx.webd.defaultpages;
 
-import com.starohub.jsb.SBObject;
 import com.starohub.webd.*;
-import com.starohub.webd.sandbox.DefaultMachine;
-import com.starohub.webd.sandbox.DefaultSBObject;
-import com.starohub.webd.sandbox.DefaultSandbox;
-import jsb.SFile;
-import jsb.io.SInputStream;
+import jsb.webd.SSession;
 import jsx.webd.*;
 
-import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -63,7 +57,7 @@ public class DefaultFileSystemPage extends Page {
 
     protected PageRequest createRequestPattern() {
         PageRequest pr = new PageRequest("request." + code(), name(), desc(), "get", "/**");
-        pr.put(new PageItem("uri", "URI of page which causes error", "", String.class.getName(), "/error.yo", "/error.yo"));
+        pr.put(new PageItem("uri", "URI of page", "", String.class.getName(), "", ""));
         pr.put(new PageItem("error", "Stacktrace of error", "", String.class.getName(), "", ""));
         return pr;
     }
@@ -91,58 +85,44 @@ public class DefaultFileSystemPage extends Page {
             FileItem item = new FileItem(sbObject(), uri);
 
             if (item.kind().equalsIgnoreCase("folder")) {
-                String filepath = item.filepath();
-                if (filepath.endsWith("/")) {
-                    filepath = filepath.substring(0, filepath.length() - 1);
-                }
-                FileItem indexItem = new FileItem(sbObject(), filepath + "/index.jsb");
-                if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-sandbox")) {
-                    item = indexItem;
+                if (config().hasDefaultIndexPage()) {
+                    String filepath = item.filepath();
+                    if (filepath.endsWith("/")) {
+                        filepath = filepath.substring(0, filepath.length() - 1);
+                    }
+                    FileItem indexItem = new FileItem(sbObject(), filepath + "/index.jsb");
+                    if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-sandbox")) {
+                        item = indexItem;
+                    } else {
+                        indexItem = new FileItem(sbObject(), filepath + "/index.jsm");
+                        if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-markup")) {
+                            item = indexItem;
+                        } else {
+                            indexItem = new FileItem(sbObject(), filepath + "/index.htm");
+                            if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
+                                item = indexItem;
+                            } else {
+                                indexItem = new FileItem(sbObject(), filepath + "/index.html");
+                                if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
+                                    item = indexItem;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             if (item.mime().equalsIgnoreCase("application/javascript-sandbox")) {
-                SFile file = sbObject().sandbox().machine().mnt().newFile(item.filepath());
-                SInputStream fis = file.inputStream();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int read = fis.read(buffer, 0, buffer.length);
-                while (read > 0) {
-                    baos.write(buffer, 0, read);
-                    read = fis.read(buffer, 0, buffer.length);
-                }
-                fis.close();
-                String js = new String(baos.toByteArray(), "UTF-8");
-                SBObject sbo = new DefaultSBObject(js, 60, api(), api().more());
-                sbo.set("_script", item.name());
-                Map iMap = new HashMap();
-                if (uri.length() == 0) {
-                    uri = "/";
-                }
-                iMap.put("uri", uri);
-                iMap.put("session", request.get("_session").value());
-                Map oMap = new HashMap();
-                Object oRS = sbo.exec("main", iMap);
-                if (oRS != null) {
-                    oMap = (Map)oRS;
-                    ps.fromMap(oMap);
-                }
+                SSession session = (SSession)request.get("_session").value();
+                api().markup().renderJSB(session, ps, item.name(), uri, item.filepath());
+                return ps;
+            }
+            if (item.mime().equalsIgnoreCase("application/javascript-markup")) {
+                SSession session = (SSession)request.get("_session").value();
+                api().markup().renderJSM(session, this, ps, uri, item.filepath());
                 return ps;
             }
             if (item.kind().equalsIgnoreCase("file")) {
-                SFile file = sbObject().sandbox().machine().mnt().newFile(item.filepath());
-                SInputStream fis = file.inputStream();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int read = fis.read(buffer, 0, buffer.length);
-                while (read > 0) {
-                    baos.write(buffer, 0, read);
-                    read = fis.read(buffer, 0, buffer.length);
-                }
-                fis.close();
-                String base64 = config().platform().encodeBase64(baos.toByteArray());
-                baos.close();
-                ps.get("_return_bytes").value(base64);
-                ps.get("_return_mime").value(item.mime());
+                api().markup().renderFile(ps, item.filepath(), item.mime());
                 return ps;
             }
             if (item.kind().equalsIgnoreCase("folder")) {

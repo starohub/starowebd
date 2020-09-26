@@ -34,9 +34,7 @@
 
 package com.starohub.webd.sandbox;
 
-import com.starohub.webd.WebD;
 import jsb.SMachine;
-import jsx.webd.Config;
 import jsx.webd.WebDApi;
 
 import java.util.Map;
@@ -58,9 +56,11 @@ public class DefaultSandbox extends com.starohub.jsb.Sandbox {
         if ("jsb.webd.SBluePrint".equals(className)) return true;
         if ("jsb.webd.SArtWork".equals(className)) return true;
         if ("jsb.webd.SDataSet".equals(className)) return true;
+        if ("jsb.webd.SRedirect".equals(className)) return true;
         if (pkg().blueprint().available()) {
             if (pkg().blueprint().visibleToScripts(className)) return true;
         }
+        if (pkg().redirect().visibleToScripts(className)) return true;
         return false;
     }
 
@@ -77,6 +77,7 @@ public class DefaultSandbox extends com.starohub.jsb.Sandbox {
         if (pkg().blueprint().available()) {
             if (pkg().blueprint().invisibleToScripts(className)) return true;
         }
+        if (pkg().redirect().invisibleToScripts(className)) return true;
         return false;
     }
 

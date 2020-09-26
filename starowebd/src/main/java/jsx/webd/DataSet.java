@@ -76,6 +76,10 @@ public abstract class DataSet {
     protected abstract void setInfo();
     protected abstract jsx.seller.PSoftware createLicense(BluePrint blueprint, String licFile);
 
+    public String jsonData(String uri) throws Exception {
+        return "{}";
+    }
+
     public String code() {
         return _code;
     }

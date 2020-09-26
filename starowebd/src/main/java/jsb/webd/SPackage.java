@@ -45,6 +45,7 @@ import jsb.io.SException;
 import jsb.io.SInputStream;
 import jsx.webd.BluePrint;
 import jsx.webd.FileItem;
+import jsx.webd.Redirect;
 import jsx.webd.WebDApi;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -58,23 +59,28 @@ import java.util.Map;
 
 public abstract class SPackage extends jsb.SPackage {
     private SBluePrint _blueprint;
+    private SRedirect _redirect;
     private WebDApi _api;
 
     public SPackage(WebDApi api, SMachine machine, Map more) {
         super(machine, more);
         _api = api;
         _blueprint = createBluePrint(this, api, api.blueprint());
+        _redirect = createRedirect(this, api, api.redirect());
     }
 
     protected WebDApi api() {
         return _api;
     }
 
+    public SRedirect redirect() { return _redirect; }
+
     public SBluePrint blueprint() {
         return _blueprint;
     }
 
     protected abstract SBluePrint createBluePrint(jsb.webd.SPackage pkg, WebDApi api, BluePrint blueprint);
+    protected abstract SRedirect createRedirect(jsb.webd.SPackage pkg, WebDApi api, Redirect redirect);
 
     protected SBObject sbObject() {
         return api().sbObject();

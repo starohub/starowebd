@@ -55,6 +55,9 @@ public class Config {
     private boolean _hasDefaultErrorPage = true;
     private boolean _hasDefaultFileSystemPage = true;
     private boolean _hasDefaultAPIDocsPage = true;
+    private boolean _hasDefaultIndexPage = true;
+    private boolean _hasPageSender = false;
+    private boolean _hasPageReceiver = false;
     private String _cfgReadonly = "{}";
     private String _cfgWritable = "{}";
     private String _cfgMounter = "{}";
@@ -63,6 +66,55 @@ public class Config {
     private BluePrint _blueprint;
     private String _blueprintLicense = null;
     private Map _more = new HashMap();
+    private String _proxyEndpoint = null;
+    private VHostList _vhostList = new VHostList();
+
+    public VHostList vhostList() {
+        return _vhostList;
+    }
+
+    /*
+    public String proxyEndpoint() {
+        return _proxyEndpoint;
+    }
+
+    public Config proxyEndpoint(String src) {
+        _proxyEndpoint = src;
+        return this;
+    }
+
+    public boolean hasPageProxy() {
+        return hasPageReceiver() || hasPageSender();
+    }
+
+    public boolean hasPageSender() {
+        return _hasPageSender;
+    }
+
+    public Config hasPageSender(boolean src) {
+        _hasPageSender = src;
+        return this;
+    }
+
+    public boolean hasPageReceiver() {
+        return _hasPageReceiver;
+    }
+
+    public Config hasPageReceiver(boolean src) {
+        _hasPageReceiver = src;
+        return this;
+    }
+
+     */
+
+    public boolean hasDefaultIndexPage() {
+        return _hasDefaultIndexPage;
+    }
+
+    public Config hasDefaultIndexPage(boolean src) {
+        _hasDefaultIndexPage = src;
+        return this;
+    }
 
     public Map more() {
         return _more;

@@ -35,52 +35,99 @@
 package com.starohub.webd.sandbox.webd;
 
 import com.starohub.webd.IHTTPSession;
+import jsx.webd.WebDApi;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class DefaultSession extends jsb.webd.SSession {
     private IHTTPSession _session;
-    private Map<String, String> _files;
 
-    public DefaultSession(Object source) {
-        super(source);
+    public DefaultSession(WebDApi api, Object source) {
+        super(api, source);
         if (source instanceof IHTTPSession) {
             _session = (IHTTPSession)source;
         }
-
+        setup();
     }
 
     @Override
-    public String uri() {
-        return _session.getUri();
+    protected String createHost() {
+        String rawHost = getHostFromHeaders();
+        int idx = rawHost.lastIndexOf(":");
+        if (idx >= 0) {
+            return rawHost.substring(0, idx);
+        }
+        return rawHost;
     }
 
     @Override
-    public String method() {
-        return _session.getMethod().name();
+    protected int createPort() {
+        String rawHost = getHostFromHeaders();
+        int idx = rawHost.lastIndexOf(":");
+        if (idx >= 0) {
+            return Integer.parseInt(rawHost.substring(idx + 1));
+        }
+        return 80;
     }
 
     @Override
-    public Map<String, String> params() {
-        return _session.getParms();
+    protected String createSessionId() {
+        if (_session != null) {
+            String ts = _session.getCookies().read("SESSION_ID");
+            if (ts == null) {
+                ts = UUID.randomUUID().toString().replaceAll("-", "");
+                _session.getCookies().set("SESSION_ID", ts, 1000 * 60 * 60 * 24 * 365 * 10);
+            }
+            return ts;
+        }
+        return null;
     }
 
     @Override
-    public Map<String, String> headers() {
-        return _session.getHeaders();
+    protected String createUri() {
+        if (_session != null) {
+            return _session.getUri();
+        }
+        return null;
     }
 
     @Override
-    public Map<String, String> files() {
-        if (_files == null) {
-            _files = new HashMap<>();
+    protected String createMethod() {
+        if (_session != null) {
+            return _session.getMethod().name();
+        }
+        return null;
+    }
+
+    @Override
+    protected Map<String, String> createParams() {
+        if (_session != null) {
+            return _session.getParms();
+        }
+        return null;
+    }
+
+    @Override
+    protected Map<String, String> createHeaders() {
+        if (_session != null) {
+            return _session.getHeaders();
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, String> createFiles() {
+        if (_session != null) {
+            Map<String, String> files = new HashMap<>();
             try {
-                _session.parseBody(_files);
+                _session.parseBody(files);
             } catch (Throwable e) {
             }
+            return files;
         }
-        return _files;
+        return null;
     }
 
     @Override

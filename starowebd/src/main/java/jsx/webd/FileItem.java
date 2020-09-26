@@ -151,6 +151,15 @@ public class FileItem {
         if (_ext.equalsIgnoreCase("jsb")) {
             _mime = "application/javascript-sandbox";
         }
+        if (_ext.equalsIgnoreCase("jsr")) {
+            _mime = "application/javascript-redirect";
+        }
+        if (_ext.equalsIgnoreCase("html") || _ext.equalsIgnoreCase("htm")) {
+            _mime = "text/html";
+        }
+        if (_ext.equalsIgnoreCase("jsm")) {
+            _mime = "application/javascript-markup";
+        }
         return this;
     }
 

@@ -64,6 +64,7 @@ public class PageResponse {
         put(new PageItem("_return_html", "Returned HTML", "HTML code which is returned. NULL if not used.", String.class.getName(), null, null));
         put(new PageItem("_return_bytes", "Returned Byte Array in Base64 String", "Byte array in base64 string which is returned. NULL if not used.", String.class.getName(), null, null));
         put(new PageItem("_return_mime", "Returned Mime Type", "Mime type which is returned. NULL if not used.", String.class.getName(), null, null));
+        put(new PageItem("_return_json", "Returned JSON Object", "JSON object which is returned. NULL if not used.", String.class.getName(), null, null));
         get("_redirect").system(true);
         get("_error").system(true);
         get("_return_list").system(true);

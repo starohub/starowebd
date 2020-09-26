@@ -73,6 +73,14 @@ public class SDataSet {
         return pkg().blueprint();
     }
 
+    public String jsonData(String uri) throws SException {
+        try {
+            return dataset().jsonData(uri);
+        } catch (Throwable e) {
+            throw pkg().machine().io().newException(e);
+        }
+    }
+
     public String mergeJsonObject(String code, String dsCode, String path, String data, Map args) throws SException {
         try {
             return dataset().mergeJsonObject(code, dsCode, path, data, args);

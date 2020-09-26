@@ -36,8 +36,11 @@ package jsx.webd;
 
 import com.starohub.webd.Tool;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Platform {
@@ -93,5 +96,41 @@ public class Platform {
         } catch (Throwable e) {
         }
         return this;
+    }
+
+    public String proxy(String host, String reqJson) {
+        String resJson = "{\"res\": {}}";
+        try {
+            VHost vh = config().vhostList().find(host);
+            if (vh != null && vh.proxyEndpoint() != null) {
+                String url = vh.proxyEndpoint();
+                HttpURLConnection conn = (HttpURLConnection)(new URL(url)).openConnection();
+                String urlParameters  = "req=" + URLEncoder.encode(reqJson, "UTF-8");
+                byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+                int    postDataLength = postData.length;
+                conn.setDoOutput( true );
+                conn.setInstanceFollowRedirects( false );
+                conn.setRequestMethod( "POST" );
+                conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestProperty( "charset", "utf-8");
+                conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+                conn.setUseCaches( false );
+                try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
+                    wr.write( postData );
+                }
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String inputLine;
+                StringBuffer content = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                in.close();
+
+                resJson = content.toString();
+            }
+        } catch(Throwable e) {
+            log(e);
+        }
+        return resJson;
     }
 }

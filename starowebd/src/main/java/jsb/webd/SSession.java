@@ -34,32 +34,196 @@
 
 package jsb.webd;
 
+import com.starohub.webd.Tool;
+import jsb.SFile;
+import jsb.io.SException;
+import jsb.io.SOutputStream;
+import jsx.webd.WebDApi;
+
+import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public abstract class SSession {
+    private WebDApi _api;
     private Object _source;
+    protected String _sessionId;
+    protected String _uri;
+    protected String _method;
+    protected String _host;
+    protected int _port;
+    protected Map<String, String> _params;
+    protected Map<String, String> _headers;
+    protected Map<String, String> _files;
 
-    public SSession(Object source) {
+    public SSession(WebDApi api, Object source) {
+        _api = api;
         _source = source;
+    }
+
+    protected SSession setup() {
+        _uri = createUri();
+        _method = createMethod();
+        _sessionId = createSessionId();
+        _params = createParams();
+        _headers = createHeaders();
+        _files = createFiles();
+        _host = createHost();
+        _port = createPort();
+        return this;
+    }
+
+    protected WebDApi api() {
+        return _api;
     }
 
     public Object source() {
         return _source;
     }
 
-    public abstract String uri();
+    protected abstract String createHost();
 
-    public abstract String method();
+    public final String host() { return _host; }
 
-    public abstract Map<String, String> params();
+    protected abstract int createPort();
 
-    public abstract Map<String, String> headers();
+    public final int port() { return _port; }
 
-    public abstract Map<String, String> files();
+    public String sessionId() {
+        return _sessionId;
+    }
+
+    protected String createSessionId() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    protected abstract String createUri();
+
+    public final String uri() {
+        return _uri;
+    }
+
+    protected abstract String createMethod();
+
+    public final String method() {
+        return _method;
+    }
+
+    public final Map<String, String> params() { return _params; };
+
+    protected abstract Map<String, String> createParams();
+
+    public final Map<String, String> headers() {
+        return _headers;
+    }
+
+    protected abstract Map<String, String> createHeaders();
+
+    public abstract Map<String, String> createFiles();
+
+    public final Map<String, String> files() { return _files; }
 
     public abstract Map<String, String> posts();
 
     public abstract Map<String, String> gets();
 
     public abstract String queryString();
+
+    public SSession setData(String name, Object value) {
+        api().sessionData().set(this, name, value);
+        return this;
+    }
+
+    public Object getData(String name, Object defValue) {
+        return api().sessionData().get(this, name, defValue);
+    }
+
+    public SSession clearData() {
+        api().sessionData().clear(this);
+        return this;
+    }
+
+    public boolean hasFile(String name) {
+        return files().containsKey(name);
+    }
+
+    public SSession saveFile(String name, String path) throws SException {
+        if (!hasFile(name)) return this;
+        try {
+            String parent = path;
+            int idx = parent.lastIndexOf("/");
+            if (idx >= 0) {
+                parent = parent.substring(0, idx);
+            }
+            api().sbObject().sandbox().machine().mnt().newFile(parent).mkdirs();
+
+            String tmpFile = files().get(name);
+            FileInputStream fis = new FileInputStream(tmpFile);
+            SFile sfile = api().sbObject().sandbox().machine().mnt().newFile(path);
+            SOutputStream fos = sfile.outputStream();
+            byte[] buffer = new byte[1024];
+            int read = fis.read(buffer, 0, buffer.length);
+            while (read > 0) {
+                fos.write(buffer, 0, read);
+                read = fis.read(buffer, 0, buffer.length);
+            }
+            fis.close();
+            fos.close();
+        } catch (Throwable e) {
+            throw api().sbObject().sandbox().machine().io().newException(e);
+        }
+        return this;
+    }
+
+    protected String getHostFromHeaders() {
+        String tag = "localhost:80";
+        for (String key : _headers.keySet()) {
+            if ("host".equalsIgnoreCase(key)) {
+                tag = _headers.get(key);
+            }
+        }
+        return tag;
+    }
+
+    public Map toMap() {
+        Map tag = new HashMap();
+        tag.put("uri", uri());
+        tag.put("sessionId", sessionId());
+        tag.put("method", method());
+        tag.put("host", host());
+        tag.put("port", port());
+        tag.put("params", params());
+        tag.put("headers", headers());
+        tag.put("files", files());
+        return tag;
+    }
+
+    public SSession fromMap(Map srcMap) {
+        _uri = srcMap.get("uri") + "";
+        _method = srcMap.get("method") + "";
+        _sessionId = srcMap.get("sessionId") + "";
+        _host = srcMap.get("host") + "";
+        try {
+            _port = Integer.parseInt((srcMap.get("port") + "").replaceAll("\\.0", ""));
+        } catch (Exception e) {
+            _port = 80;
+        }
+        _params = new HashMap<>();
+        Map src = Tool.mapItemToMap(srcMap, "params");
+        for (Object key : src.keySet()) {
+            _params.put(key + "", src.get(key) + "");
+        }
+        _headers = new HashMap<>();
+        src = Tool.mapItemToMap(srcMap, "headers");
+        for (Object key : src.keySet()) {
+            _headers.put(key + "", src.get(key) + "");
+        }
+        _files = new HashMap<>();
+        src = Tool.mapItemToMap(srcMap, "files");
+        for (Object key : src.keySet()) {
+            _files.put(key + "", src.get(key) + "");
+        }
+        return this;
+    }
 }

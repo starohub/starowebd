@@ -173,6 +173,23 @@ public abstract class Page {
         return writer.toString();
     }
 
+    protected String mergeHtml(String template, Map args) throws Exception {
+        try {
+            Velocity.init();
+        } catch (Throwable e) {
+            if (config().platform() != null) {
+                config().platform().log(e);
+            }
+        }
+        VelocityContext ctx = new VelocityContext();
+        for (Object key : args.keySet()) {
+            ctx.put(key + "", args.get(key));
+        }
+        Writer writer = new StringWriter();
+        Velocity.evaluate(ctx, writer, "", template);
+        return writer.toString();
+    }
+
     protected byte[] loadResource(String path) {
         Class clazz = WebDApi.class;
         return Tool.loadResource(clazz, path);

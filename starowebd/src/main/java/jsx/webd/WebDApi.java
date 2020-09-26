@@ -38,12 +38,8 @@ import com.starohub.jsb.SBObject;
 import com.starohub.webd.IHTTPSession;
 import com.starohub.webd.Tool;
 import com.starohub.webd.WebD;
-import com.starohub.webd.sandbox.DefaultMachine;
 import com.starohub.webd.sandbox.DefaultSBObject;
-import com.starohub.webd.sandbox.DefaultSandbox;
 import com.starohub.webd.sandbox.webd.DefaultSession;
-import jsb.SMachine;
-import jsb.SModule;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Constructor;
@@ -55,11 +51,33 @@ public class WebDApi extends WebD {
     private Config _config;
     private PageFactory _pageFactory;
     private BluePrint _blueprint;
+    private Redirect _redirect;
+    private Markup _markup;
+    private SessionData _sessionData;
     private SBObject _sbobject;
     private Map _more;
+    private PageFactory _senderPageFactory;
+    private PageFactory _receiverPageFactory;
+    private PageFactory _originPageFactory;
 
     public Map more() {
         return _more;
+    }
+
+    public PageFactory originPageFactory() {
+        return _originPageFactory;
+    }
+
+    public PageFactory senderPageFactory() {
+        return _senderPageFactory;
+    }
+
+    public PageFactory receiverPageFactory() {
+        return _receiverPageFactory;
+    }
+
+    public PageFactory pageFactory() {
+        return _pageFactory;
     }
 
     public WebDApi(Config config, Map more) {
@@ -73,20 +91,43 @@ public class WebDApi extends WebD {
     protected void initialize() {
         this.setAsyncRunner(new com.starohub.webd.BoundRunner(Executors.newFixedThreadPool(_config.threadCount())));
         _pageFactory = createPageFactory();
+        _senderPageFactory = createSenderPageFactory();
+        _receiverPageFactory = createReceiverPageFactory();
+        _originPageFactory = createOriginPageFactory();
         _config.pageFactory(_pageFactory);
         _sbobject = createSBObject(more());
         _blueprint = createBlueprint(_config);
+        _redirect = createRedirect();
+        _markup = createMarkup();
+        _sessionData = createSessionData();
+        syncVUsers();
     }
 
+    protected WebDApi syncVUsers() {
+        for (VHost h : config().vhostList().hosts()) {
+            for (VUser u : h.users().users()) {
+                u.fromMap(this, u.toMap());
+            }
+        }
+        return this;
+    }
     public WebDApi addPage(Page p) {
         _pageFactory.add(p);
         return this;
     }
 
+    protected SessionData createSessionData() { return new jsx.webd.SessionData(this); }
+
+    protected Markup createMarkup() { return new jsx.webd.Markup(this); }
+
+    protected Redirect createRedirect() {
+        return new jsx.webd.Redirect(this);
+    }
+
     protected BluePrint createBlueprint(Config config) {
         try {
-            if (_config.blueprintClass() != null) {
-                Class<?> clazz = Class.forName(_config.blueprintClass());
+            if (config.blueprintClass() != null) {
+                Class<?> clazz = Class.forName(config.blueprintClass());
                 Class<? extends BluePrint> newClass = clazz.asSubclass(BluePrint.class);
                 for (Constructor<?> ctor : newClass.getConstructors()) {
                     Class<?>[] paramTypes = ctor.getParameterTypes();
@@ -104,6 +145,12 @@ public class WebDApi extends WebD {
         }
         return null;
     }
+
+    public SessionData sessionData() { return _sessionData; }
+
+    public Markup markup() { return _markup; }
+
+    public Redirect redirect() { return _redirect; }
 
     public BluePrint blueprint() {
         return _blueprint;
@@ -127,12 +174,24 @@ public class WebDApi extends WebD {
         return Tool.loadResource(clazz, path);
     }
 
+    protected PageFactory createOriginPageFactory() {
+        return new PageFactory(this, true, false, false);
+    }
+
+    protected PageFactory createSenderPageFactory() {
+        return new PageFactory(this, false, true, false);
+    }
+
+    protected PageFactory createReceiverPageFactory() {
+        return new PageFactory(this, false, false, true);
+    }
+
     protected PageFactory createPageFactory() {
-        return new PageFactory(this);
+        return new PageFactory(this, false, false, false);
     }
 
     protected jsb.webd.SSession createSession(Object source) {
-        return new DefaultSession(source);
+        return new DefaultSession(this, source);
     }
 
     private IHTTPSession backwardSession(jsb.webd.SSession session) {
@@ -145,21 +204,29 @@ public class WebDApi extends WebD {
             final jsb.webd.SSession session = createSession(source);
             final String path = session.uri();
 
-            if (path.startsWith("/fonts/") || path.startsWith("/styles/") || path.startsWith("/scripts/") || path.startsWith("/images/")) {
-                try {
-                    if (path.endsWith(".js")) {
-                        return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, "application/javascript", new ByteArrayInputStream(loadResource(path)));
+            VHost vh = config().vhostList().find(session.host());
+            if (vh == null || !vh.hasPageProxy()) {
+                if (path.startsWith("/fonts/") || path.startsWith("/styles/") || path.startsWith("/scripts/") || path.startsWith("/images/")) {
+                    try {
+                        if (path.endsWith(".js")) {
+                            return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, "application/javascript", new ByteArrayInputStream(loadResource(path)));
+                        }
+                        if (path.endsWith(".css")) {
+                            return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, "text/css", new ByteArrayInputStream(loadResource(path)));
+                        }
+                        return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, "application/download", new ByteArrayInputStream(loadResource(path)));
+                    } catch (Exception e) {
+                        return com.starohub.webd.Tool.newHtmlResponse("");
                     }
-                    if (path.endsWith(".css")) {
-                        return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, "text/css", new ByteArrayInputStream(loadResource(path)));
-                    }
-                    return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, "application/download", new ByteArrayInputStream(loadResource(path)));
-                } catch (Exception e) {
-                    return com.starohub.webd.Tool.newHtmlResponse("");
                 }
             }
 
-            PageResponse ps = _pageFactory.run(session);
+            PageResponse ps;
+            if (vh == null || !vh.hasPageProxy()) {
+                ps = _originPageFactory.run(session);
+            } else {
+                ps = _pageFactory.run(session);
+            }
             if (ps != null) {
                 if (ps.has("_redirect")) {
                     String url = ps.get("_redirect").value().toString();
@@ -177,6 +244,9 @@ public class WebDApi extends WebD {
                         String mime = ps.get("_return_mime").value().toString();
                         byte[] data = config().platform().decodeBase64(ps.get("_return_bytes").value().toString());
                         return com.starohub.webd.Tool.newChunkedResponse(com.starohub.webd.Status.OK, mime, new ByteArrayInputStream(data));
+                    } else if (ps.has("_return_json")) {
+                        Map jsonMap = Tool.jsonToMap(ps.get("_return_json").value() + "");
+                        return com.starohub.webd.Tool.newMapResponse(jsonMap);
                     } else {
                         return com.starohub.webd.Tool.newMapResponse(ps.toMap());
                     }
