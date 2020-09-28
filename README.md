@@ -10,7 +10,7 @@
 
 ### Release
 
-[Release 0.1.5](https://github.com/starohub/starowebd/releases/tag/0.1.5)
+[Release 0.1.6](https://github.com/starohub/starowebd/releases/tag/0.1.6)
 
 ### Maven
 
@@ -78,11 +78,11 @@
             <systemPath>${project.basedir}/lib/slf4j-simple-1.7.26.jar</systemPath>
         </dependency>
 
-        <!-- https://github.com/starohub/starowebd/releases/tag/0.1.5 -->
+        <!-- https://github.com/starohub/starowebd/releases/tag/0.1.6 -->
         <dependency>
             <groupId>com.starohub.webd</groupId>
             <artifactId>starowebd</artifactId>
-            <version>0.1.5</version>
+            <version>0.1.6</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/starowebd.jar</systemPath>
         </dependency>
@@ -125,8 +125,6 @@
 
 ```
 String configFile = "";
-String blueprintClass = "com.starohub.trial.blueprint.BluePrint";
-String blueprintLicense = "/bpt/com.starohub.trial.blueprint/license.lic";
-String[] args = new String[] {configFile, blueprintClass, blueprintLicense};
+String[] args = new String[] {configFile};
 com.starohub.webd.WebDLoader.main(args);
 ```
