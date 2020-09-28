@@ -1,19 +1,17 @@
 package com.starohub.trial.dataset;
 
-import com.starohub.webd.Tool;
 import jsb.SFile;
 import jsb.io.SInputStream;
 import jsb.webd.SSession;
+import jsx.webd.BluePrint;
 import jsx.webd.PageRequest;
 import jsx.webd.PageResponse;
-import jsx.webd.WebDApi;
 
 import java.io.ByteArrayOutputStream;
-import java.util.logging.Level;
 
 public class BuyerPage extends jsx.webd.Page {
-    public BuyerPage(WebDApi api) {
-        super(api, "starotrial.dataset.buyer", "Buyer JSON", "Receive buyer JSON file.");
+    public BuyerPage(BluePrint bluePrint) {
+        super(bluePrint, "starotrial.dataset.buyer", "Buyer JSON", "Receive buyer JSON file.");
     }
 
     @Override
@@ -36,7 +34,7 @@ public class BuyerPage extends jsx.webd.Page {
     }
 
     @Override
-    public PageRequest sessionToRequest(SSession sSession) {
+    public PageRequest sessionToRequest(SSession session) {
         PageRequest pr = requestPattern().clone();
         return pr;
     }
@@ -45,7 +43,7 @@ public class BuyerPage extends jsx.webd.Page {
     public PageResponse run(PageRequest pageRequest) {
         PageResponse ps = responsePattern().clone();
         try {
-            SFile file = sbObject().sandbox().machine().mnt().newFile("/dts/com.starohub.trial.dataset/common/buyer.json");
+            SFile file = blueprint().sbObject().sandbox().machine().mnt().newFile("/dts/com.starohub.trial.dataset/common/buyer.json");
             SInputStream fis = file.inputStream();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -55,15 +53,14 @@ public class BuyerPage extends jsx.webd.Page {
                 read = fis.read(buffer, 0, buffer.length);
             }
             fis.close();
-            String base64 = config().platform().encodeBase64(baos.toByteArray());
+            String base64 = platform().encodeBase64(baos.toByteArray());
             baos.close();
             ps.get("_return_bytes").value(base64);
             ps.get("_return_mime").value("application/json");
             return ps;
         } catch (Throwable e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

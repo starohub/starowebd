@@ -6,7 +6,6 @@ import jsb.SMachine;
 import jsx.seller.PSoftware;
 import jsx.webd.BluePrint;
 import jsx.webd.TagReaderFactory;
-import jsx.webd.WebDApi;
 
 import java.util.Map;
 
@@ -16,8 +15,8 @@ public class DataSet extends jsx.webd.DataSet {
     }
 
     @Override
-    protected void createPages(WebDApi webDApi) {
-        webDApi.addPage(new BuyerPage(webDApi));
+    protected void createPages() {
+        blueprint().pageFactory().add(new BuyerPage(blueprint()));
     }
 
     @Override
@@ -34,7 +33,7 @@ public class DataSet extends jsx.webd.DataSet {
             filename = "/trial/static/jsm-dyna/data.json";
         }
         if (filename == null) return "{}";
-        SFile sfile = blueprint().api().sbObject().sandbox().machine().mnt().newFile(filename);
+        SFile sfile = blueprint().sbObject().sandbox().machine().mnt().newFile(filename);
         if (sfile.exists()) {
             try {
                 return new String(sfile.readFile(), "UTF-8");
@@ -46,20 +45,20 @@ public class DataSet extends jsx.webd.DataSet {
     }
 
     @Override
-    protected PSoftware createLicense(BluePrint bluePrint, String licFile) {
-        return new License(bluePrint.api().sbObject().sandbox().machine(), licFile, true);
+    protected TagReaderFactory createTagReaderFactory(BluePrint bluePrint, jsx.webd.DataSet dataSet) {
+        return new DataSetTagReaderFactory(bluePrint, dataSet);
     }
 
     @Override
-    protected TagReaderFactory createTagReaderFactory(WebDApi webDApi, BluePrint bluePrint, jsx.webd.DataSet dataSet) {
-        return new DataSetTagReaderFactory(bluePrint, dataSet);
+    protected PSoftware createLicense(BluePrint bluePrint, String licFile) {
+        return new License(bluePrint.sbObject().sandbox().machine(), licFile, true);
     }
 
     @Override
     protected byte[] loadResource(String code, String path) {
         String filename = "/dts/com.starohub.trial.dataset/" + code + path.replaceAll("/templates", "");
         try {
-            SFile sfile = blueprint().api().sbObject().sandbox().machine().mnt().newFile(filename);
+            SFile sfile = blueprint().sbObject().sandbox().machine().mnt().newFile(filename);
             return sfile.readFile();
         } catch (Throwable e) {
             e.printStackTrace();

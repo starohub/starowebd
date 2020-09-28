@@ -3,19 +3,18 @@ package com.starohub.trial.blueprint;
 import jsb.SMachine;
 import jsb.webd.*;
 import jsx.seller.PSoftware;
-import jsx.webd.ArtWork;
-import jsx.webd.DataSet;
-import jsx.webd.Kernel;
-import jsx.webd.WebDApi;
+import jsx.webd.*;
+
+import java.util.Map;
 
 public class BluePrint extends jsx.webd.BluePrint {
-    public BluePrint(WebDApi api) {
-        super(api);
+    public BluePrint(Map more) {
+        super(more);
     }
 
     @Override
-    protected void createPages(WebDApi webDApi) {
-        webDApi.addPage(new MACPage(webDApi));
+    protected void createPages(PageFactory pageFactory) {
+        pageFactory.add(new MACPage(this));
     }
 
     @Override
@@ -26,28 +25,28 @@ public class BluePrint extends jsx.webd.BluePrint {
     }
 
     @Override
-    protected PSoftware createLicense(WebDApi webDApi, String licFile) {
-        return new License(webDApi.sbObject().sandbox().machine(), licFile, true);
+    protected PSoftware createLicense(jsx.webd.BluePrint blueprint, String licFile) {
+        return new License(blueprint.sbObject().sandbox().machine(), licFile, true);
     }
 
     @Override
-    public SBluePrint createSBluePrint(SPackage sPackage, WebDApi webDApi, jsx.webd.BluePrint bluePrint) {
-        return new jsb.trial.blueprint.BluePrint(sPackage, webDApi, bluePrint);
+    public SBluePrint createSBluePrint(SPackage sPackage, jsx.webd.BluePrint bluePrint) {
+        return new jsb.trial.blueprint.BluePrint(sPackage, bluePrint);
     }
 
     @Override
-    public SArtWork createSArtWork(SPackage sPackage, WebDApi webDApi, ArtWork artWork) {
-        return new com.starohub.webd.sandbox.webd.DefaultArtWork(sPackage, webDApi, artWork);
+    public SArtWork createSArtWork(SPackage sPackage, SBluePrint sBluePrint, ArtWork artWork) {
+        return new com.starohub.webd.sandbox.webd.DefaultArtWork(sPackage, sBluePrint, artWork);
     }
 
     @Override
-    public SDataSet createSDataSet(SPackage sPackage, WebDApi webDApi, DataSet dataSet) {
-        return new com.starohub.webd.sandbox.webd.DefaultDataSet(sPackage, webDApi, dataSet);
+    public SDataSet createSDataSet(SPackage sPackage, SBluePrint sBluePrint, DataSet dataSet) {
+        return new com.starohub.webd.sandbox.webd.DefaultDataSet(sPackage, sBluePrint, dataSet);
     }
 
     @Override
-    public SKernel createSKernel(SPackage sPackage, WebDApi webDApi, Kernel kernel) {
-        return new jsb.trial.kernel.Kernel(sPackage, webDApi, kernel);
+    public SKernel createSKernel(SPackage sPackage, SBluePrint sBluePrint, Kernel kernel) {
+        return new jsb.trial.kernel.Kernel(sPackage, sBluePrint, kernel);
     }
 
     private class License extends jsx.seller.PSoftware {

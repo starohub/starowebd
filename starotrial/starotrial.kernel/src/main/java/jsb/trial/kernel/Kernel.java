@@ -1,18 +1,17 @@
 package jsb.trial.kernel;
 
+import jsb.webd.SBluePrint;
 import jsb.webd.SKernel;
 import jsb.webd.SPackage;
-import jsx.webd.WebDApi;
 
 public class Kernel extends jsb.webd.SKernel {
-    public Kernel(SPackage pkg, WebDApi api, jsx.webd.Kernel kernel) {
-        super(pkg, api, kernel);
+    public Kernel(SPackage pkg, SBluePrint blueprint, jsx.webd.Kernel kernel) {
+        super(pkg, blueprint, kernel);
     }
 
-    protected com.starohub.trial.kernel.Kernel kernel() {
-        return (com.starohub.trial.kernel.Kernel)super.kernel();
+    protected com.starohub.trial.kernel.Kernel castedKernel() {
+        return (com.starohub.trial.kernel.Kernel)kernel();
     }
-
     @Override
     protected SKernel setupVisible() {
         customVisible("jsb.trial.kernel.Kernel", false);
@@ -20,6 +19,6 @@ public class Kernel extends jsb.webd.SKernel {
     }
 
     public String currentTime() {
-        return kernel().currentTime();
+        return castedKernel().currentTime();
     }
 }

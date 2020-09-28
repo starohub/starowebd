@@ -4,7 +4,6 @@ import jsb.SFile;
 import jsb.SMachine;
 import jsx.seller.PSoftware;
 import jsx.webd.BluePrint;
-import jsx.webd.WebDApi;
 
 import java.util.Map;
 
@@ -14,8 +13,8 @@ public class ArtWork extends jsx.webd.ArtWork {
     }
 
     @Override
-    protected void createPages(WebDApi webDApi) {
-        webDApi.addPage(new BannerPage(webDApi));
+    protected void createPages() {
+        blueprint().pageFactory().add(new BannerPage(blueprint()));
     }
 
     @Override
@@ -27,7 +26,7 @@ public class ArtWork extends jsx.webd.ArtWork {
 
     @Override
     protected PSoftware createLicense(BluePrint bluePrint, String licFile) {
-        return new License(bluePrint.api().sbObject().sandbox().machine(), licFile, true);
+        return new License(bluePrint.sbObject().sandbox().machine(), licFile, true);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class ArtWork extends jsx.webd.ArtWork {
     protected byte[] loadResource(String code, String path) {
         String filename = "/atw/com.starohub.trial.artwork/" + code + path.replaceAll("/templates", "");
         try {
-            SFile sfile = blueprint().api().sbObject().sandbox().machine().mnt().newFile(filename);
+            SFile sfile = blueprint().sbObject().sandbox().machine().mnt().newFile(filename);
             return sfile.readFile();
         } catch (Throwable e) {
             return new byte[0];

@@ -1,6 +1,5 @@
 package com.starohub.trial.kernel;
 
-import com.starohub.platies.Platies;
 import jsb.SMachine;
 import jsx.seller.PSoftware;
 import jsx.webd.BluePrint;
@@ -10,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
 
 public class Kernel extends jsx.webd.Kernel {
     public Kernel(BluePrint blueprint, String licFile) {
@@ -25,13 +23,13 @@ public class Kernel extends jsx.webd.Kernel {
     }
 
     @Override
-    protected void createPages(WebDApi webDApi) {
+    protected void createPages() {
 
     }
 
     @Override
     protected PSoftware createLicense(BluePrint bluePrint, String licFile) {
-        return new License(bluePrint.api().sbObject().sandbox().machine(), licFile, true);
+        return new License(bluePrint.sbObject().sandbox().machine(), licFile, true);
     }
 
     public String currentTime() {

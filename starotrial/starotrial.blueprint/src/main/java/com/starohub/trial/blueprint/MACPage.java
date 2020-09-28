@@ -2,18 +2,18 @@ package com.starohub.trial.blueprint;
 
 import com.starohub.webd.Tool;
 import jsb.webd.SSession;
+import jsx.webd.BluePrint;
 import jsx.webd.PageItem;
 import jsx.webd.PageRequest;
 import jsx.webd.PageResponse;
-import jsx.webd.WebDApi;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.logging.Level;
 
 public class MACPage extends jsx.webd.Page {
-    public MACPage(WebDApi api) {
-        super(api, "starotrial.mac", "MAC", "Receive MAC address.");
+    public MACPage(BluePrint bluePrint) {
+        super(bluePrint, "starotrial.mac", "MAC", "Receive MAC address.");
     }
 
     @Override
@@ -61,9 +61,8 @@ public class MACPage extends jsx.webd.Page {
 
             ps.get("mac").value(mac);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }
