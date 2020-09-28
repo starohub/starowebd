@@ -35,6 +35,8 @@
 package com.starohub.webd.sandbox;
 
 import jsb.SMachine;
+import jsb.webd.SBluePrint;
+import jsb.webd.SSession;
 import jsx.webd.WebDApi;
 
 import java.util.Map;
@@ -42,8 +44,8 @@ import java.util.Map;
 public class DefaultSandbox extends com.starohub.jsb.Sandbox {
     private WebDApi _api;
 
-    public DefaultSandbox(String javascript, int timeout, WebDApi api, Map more) {
-        super(javascript, timeout, api.config().dataFolder(), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
+    public DefaultSandbox(String javascript, int timeout, WebDApi api, SSession session, Map more) {
+        super(javascript, timeout, api.config().dataFolder(session), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
         _api = api;
     }
 
@@ -57,10 +59,10 @@ public class DefaultSandbox extends com.starohub.jsb.Sandbox {
         if ("jsb.webd.SArtWork".equals(className)) return true;
         if ("jsb.webd.SDataSet".equals(className)) return true;
         if ("jsb.webd.SRedirect".equals(className)) return true;
-        if (pkg().blueprint().available()) {
-            if (pkg().blueprint().visibleToScripts(className)) return true;
+        for (SBluePrint sbp : pkg().blueprintList()) {
+            if (sbp.visibleToScripts(className)) return true;
+            if (sbp.redirect().visibleToScripts(className)) return true;
         }
-        if (pkg().redirect().visibleToScripts(className)) return true;
         return false;
     }
 
@@ -74,15 +76,16 @@ public class DefaultSandbox extends com.starohub.jsb.Sandbox {
 
     @Override
     protected boolean customInvisibleToScripts(String className) {
-        if (pkg().blueprint().available()) {
-            if (pkg().blueprint().invisibleToScripts(className)) return true;
+        for (SBluePrint sbp : pkg().blueprintList()) {
+            if (sbp.invisibleToScripts(className)) return true;
+            if (sbp.redirect().invisibleToScripts(className)) return true;
         }
-        if (pkg().redirect().invisibleToScripts(className)) return true;
         return false;
     }
 
     @Override
     protected SMachine createMachine(Map more) {
-        return new DefaultMachine((WebDApi)more.get("api"), more);
+        SSession session = (SSession)more.get("session");
+        return new DefaultMachine((WebDApi)more.get("api"), session, more);
     }
 }

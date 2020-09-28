@@ -43,37 +43,33 @@ import java.util.Map;
 
 public class SDataSet {
     private jsb.webd.SPackage _pkg;
-    private WebDApi _api;
     private DataSet _dataset;
+    private SBluePrint _blueprint;
     private SDefaultVisiblePatternStore _defaultVisibleStore;
     private SCustomVisiblePatternStore _customVisibleStore;
 
-    public SDataSet(jsb.webd.SPackage pkg, WebDApi api, DataSet dataset) {
+    public SDataSet(jsb.webd.SPackage pkg, SBluePrint blueprint, DataSet dataset) {
         _pkg = pkg;
-        _api = api;
+        _blueprint = blueprint;
         _dataset = dataset;
         _defaultVisibleStore = new SDefaultVisiblePatternStore();
         _customVisibleStore = new SCustomVisiblePatternStore();
         setupVisible();
     }
 
-    protected DataSet dataset() {
+    protected final DataSet dataset() {
         return _dataset;
     }
 
-    public jsb.webd.SPackage pkg() {
+    public final jsb.webd.SPackage pkg() {
         return _pkg;
     }
 
-    protected WebDApi api() {
-        return _api;
+    protected final SBluePrint blueprint() {
+        return _blueprint;
     }
 
-    protected SBluePrint blueprint() {
-        return pkg().blueprint();
-    }
-
-    public String jsonData(String uri) throws SException {
+    public final String jsonData(String uri) throws SException {
         try {
             return dataset().jsonData(uri);
         } catch (Throwable e) {
@@ -81,7 +77,7 @@ public class SDataSet {
         }
     }
 
-    public String mergeJsonObject(String code, String dsCode, String path, String data, Map args) throws SException {
+    public final String mergeJsonObject(String code, String dsCode, String path, String data, Map args) throws SException {
         try {
             return dataset().mergeJsonObject(code, dsCode, path, data, args);
         } catch (Throwable e) {
@@ -89,7 +85,7 @@ public class SDataSet {
         }
     }
 
-    public String mergeJsonList(String code, String dsCode, String path, String data, Map args) throws SException {
+    public final String mergeJsonList(String code, String dsCode, String path, String data, Map args) throws SException {
         try {
             return dataset().mergeJsonList(code, dsCode, path, data, args);
         } catch (Throwable e) {
@@ -97,7 +93,7 @@ public class SDataSet {
         }
     }
 
-    public Map mergeMap(String code, String dsCode, String path, String data, Map args) throws SException {
+    public final Map mergeMap(String code, String dsCode, String path, String data, Map args) throws SException {
         try {
             return dataset().mergeMap(code, dsCode, path, data, args);
         } catch (Throwable e) {
@@ -105,7 +101,7 @@ public class SDataSet {
         }
     }
 
-    public java.util.List mergeList(String code, String dsCode, String path, String data, Map args) throws SException {
+    public final java.util.List mergeList(String code, String dsCode, String path, String data, Map args) throws SException {
         try {
             return dataset().mergeList(code, dsCode, path, data, args);
         } catch (Throwable e) {
@@ -113,7 +109,7 @@ public class SDataSet {
         }
     }
 
-    public String mergeHtml(String code, String path, String data, Map args) throws SException {
+    public final String mergeHtml(String code, String path, String data, Map args) throws SException {
         try {
             return dataset().mergeHtml(code, path, data, args);
         } catch (Throwable e) {
@@ -121,7 +117,7 @@ public class SDataSet {
         }
     }
 
-    public SDataSet mergeFile(String code, String dsCode, String path, String data, Map args, String tagFile) throws SException {
+    public final SDataSet mergeFile(String code, String dsCode, String path, String data, Map args, String tagFile) throws SException {
         try {
             dataset().mergeFile(code, dsCode, path, data, args, tagFile);
             return this;
@@ -168,7 +164,7 @@ public class SDataSet {
         return false;
     }
 
-    public boolean invisibleToScripts(String className) {
+    public final boolean invisibleToScripts(String className) {
         if (_defaultVisibleStore.invisibleToScripts(className)) return true;
         if (_customVisibleStore.invisibleToScripts(className)) return true;
         return false;

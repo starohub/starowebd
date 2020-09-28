@@ -16,7 +16,7 @@ function __exec__(data) {
 	args.put('message', trial.trial());
 	var output = util.newHashMap();
 	
-	webd.theme(output, '/trial/plugin/plugin.vm', args);
+	webd.theme(session, output, '/trial/plugin/plugin.vm', args);
 	
 	data.output(output);
 }

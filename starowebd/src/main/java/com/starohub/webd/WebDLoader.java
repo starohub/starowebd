@@ -34,6 +34,7 @@
 
 package com.starohub.webd;
 
+import jsb.webd.SSession;
 import jsx.webd.Config;
 import jsx.webd.WebDApi;
 
@@ -126,15 +127,8 @@ public class WebDLoader {
                 } else {
                     cfg.apiPort(1103);
                 }
-                if (cfgMap.containsKey("blueprintClass")) {
-                    cfg.blueprintClass(cfgMap.get("blueprintClass") + "");
-                }
-                if (cfgMap.containsKey("blueprintLicense")) {
-                    cfg.blueprintLicense(cfgMap.get("blueprintLicense") + "");
-                }
-                if (args.length >= 3) {
-                    cfg.blueprintClass(args[1]);
-                    cfg.blueprintLicense(args[2]);
+                if (cfgMap.containsKey("maxWebDApi")) {
+                    cfg.maxWebDApi(Integer.parseInt(cfgMap.get("maxWebDApi").toString().replaceAll("\\.0", "")));
                 }
                 cfg.more(more);
                 new WebDLoader(cfg).startup();
@@ -188,7 +182,7 @@ public class WebDLoader {
         return this;
     }
 
-    public String dataFolder() { return _config.dataFolder(); }
+    public String dataFolder(SSession session) { return _config.dataFolder(session); }
 
     public WebD api() {
         return _api;
@@ -228,6 +222,7 @@ public class WebDLoader {
                     } catch (Exception e) {
                         Tool.LOG.log(Level.SEVERE, "Failed to start StaroWebD on port [ " + port + " ] ...");
                         cfg.platform().log("Failed to start StaroWebD on port [ " + port + " ] ...");
+                        cfg.platform().log("==> Error: " + Tool.stacktrace(e));
                         port++;
                         cfg.apiPort(port);
                     }

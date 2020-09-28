@@ -57,83 +57,83 @@ public class PageItem {
         _hidden = false;
     }
 
-    public boolean hidden() {
+    public final boolean hidden() {
         return _hidden;
     }
 
-    public PageItem hidden(boolean src) {
+    public final PageItem hidden(boolean src) {
         _hidden = src;
         return this;
     }
 
-    public boolean system() {
+    public final boolean system() {
         return _system;
     }
 
-    public PageItem system(boolean src) {
+    public final PageItem system(boolean src) {
         _system = src;
         return this;
     }
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    public PageItem code(String src) {
+    public final PageItem code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    public PageItem name(String src) {
+    public final PageItem name(String src) {
         _name = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    public PageItem desc(String src) {
+    public final PageItem desc(String src) {
         _desc = src;
         return this;
     }
 
-    public String type() {
+    public final String type() {
         return _type;
     }
 
-    public PageItem type(String src) {
+    public final PageItem type(String src) {
         _type = src;
         return this;
     }
 
-    public Object value() {
+    public final Object value() {
         return _value;
     }
 
-    public PageItem value(Object src) {
+    public final PageItem value(Object src) {
         _value = src;
         return this;
     }
 
-    public Object defaultValue() {
+    public final Object defaultValue() {
         return _defaultValue;
     }
 
-    public String defaultValueString() {
+    public final String defaultValueString() {
         return Tool.toJson(defaultValue());
     }
 
-    public PageItem defaultValue(Object src) {
+    public final PageItem defaultValue(Object src) {
         _defaultValue = src;
         return this;
     }
 
-    public PageItem clone() {
+    public final PageItem clone() {
         return new PageItem(code(), name(), desc(), type(), value(), defaultValue());
     }
 }

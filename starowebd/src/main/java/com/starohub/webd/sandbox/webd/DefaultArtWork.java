@@ -34,11 +34,12 @@
 
 package com.starohub.webd.sandbox.webd;
 
+import jsb.webd.SBluePrint;
 import jsb.webd.SPackage;
-import jsx.webd.WebDApi;
+import jsx.webd.ArtWork;
 
 public class DefaultArtWork extends jsb.webd.SArtWork {
-    public DefaultArtWork(SPackage pkg, WebDApi api, jsx.webd.ArtWork artwork) {
-        super(pkg, api, artwork);
+    public DefaultArtWork(SPackage pkg, SBluePrint blueprint, ArtWork artwork) {
+        super(pkg, blueprint, artwork);
     }
 }

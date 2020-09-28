@@ -34,21 +34,14 @@
 
 package jsx.webd.defaultpages;
 
-import com.starohub.jsb.SBObject;
 import com.starohub.webd.Tool;
-import com.starohub.webd.sandbox.DefaultSBObject;
-import jsb.SFile;
-import jsb.io.SInputStream;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultIndexPage extends Page {
+public class DefaultIndexPage extends MasterPage {
     public DefaultIndexPage(WebDApi api) {
         super(api,"system.default_index", "Default Index", "Default index page of StaroWebD.");
     }
@@ -57,24 +50,24 @@ public class DefaultIndexPage extends Page {
         if (config().hasDefaultFileSystemPage()) return false;
         if (!config().hasDefaultIndexPage()) return false;
 
-        FileItem item = new FileItem(sbObject(), session.uri());
+        FileItem item = new FileItem(api().blueprint(session).sbObject(), session.uri());
         if (item.kind().equalsIgnoreCase("not_found")) return false;
         if (!item.kind().equalsIgnoreCase("folder")) return false;
 
         String filepath = session.uri();
-        FileItem indexItem = new FileItem(sbObject(), filepath + "/index.jsb");
+        FileItem indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.jsb");
         if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-sandbox")) {
             item = indexItem;
         } else {
-            indexItem = new FileItem(sbObject(), filepath + "/index.jsm");
+            indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.jsm");
             if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-markup")) {
                 item = indexItem;
             } else {
-                indexItem = new FileItem(sbObject(), filepath + "/index.htm");
+                indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.htm");
                 if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
                     item = indexItem;
                 } else {
-                    indexItem = new FileItem(sbObject(), filepath + "/index.html");
+                    indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.html");
                     if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
                         item = indexItem;
                     }
@@ -116,12 +109,15 @@ public class DefaultIndexPage extends Page {
     public PageResponse run(PageRequest request) {
         PageResponse ps = responsePattern().clone();
         try {
+            SSession session = (SSession)request.get("_session").value();
+
             String uri = request.get("uri").value().toString().substring(1);
             if (uri.endsWith("/")) {
                 uri = uri.substring(0, uri.length() - 1);
             }
             uri = "/" + uri;
-            FileItem item = new FileItem(sbObject(), uri);
+
+            FileItem item = new FileItem(api().blueprint(session).sbObject(), uri);
 
             if (item.kind().equalsIgnoreCase("folder")) {
                 if (config().hasDefaultIndexPage()) {
@@ -129,19 +125,19 @@ public class DefaultIndexPage extends Page {
                     if (filepath.endsWith("/")) {
                         filepath = filepath.substring(0, filepath.length() - 1);
                     }
-                    FileItem indexItem = new FileItem(sbObject(), filepath + "/index.jsb");
+                    FileItem indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.jsb");
                     if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-sandbox")) {
                         item = indexItem;
                     } else {
-                        indexItem = new FileItem(sbObject(), filepath + "/index.jsm");
+                        indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.jsm");
                         if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-markup")) {
                             item = indexItem;
                         } else {
-                            indexItem = new FileItem(sbObject(), filepath + "/index.htm");
+                            indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.htm");
                             if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
                                 item = indexItem;
                             } else {
-                                indexItem = new FileItem(sbObject(), filepath + "/index.html");
+                                indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.html");
                                 if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
                                     item = indexItem;
                                 }
@@ -151,24 +147,21 @@ public class DefaultIndexPage extends Page {
                 }
             }
             if (item.mime().equalsIgnoreCase("application/javascript-sandbox")) {
-                SSession session = (SSession)request.get("_session").value();
                 api().markup().renderJSB(session, ps, item.name(), uri, item.filepath());
                 return ps;
             }
             if (item.mime().equalsIgnoreCase("application/javascript-markup")) {
-                SSession session = (SSession)request.get("_session").value();
                 api().markup().renderJSM(session, this, ps, uri, item.filepath());
                 return ps;
             }
             if (item.mime().equalsIgnoreCase("text/html")) {
-                api().markup().renderFile(ps, item.filepath(), item.mime());
+                api().markup().renderFile(session, ps, item.filepath(), item.mime());
                 return ps;
             }
             throw new Exception("Not recognized item.");
         } catch (Throwable e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

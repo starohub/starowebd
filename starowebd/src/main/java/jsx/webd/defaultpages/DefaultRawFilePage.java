@@ -34,15 +34,15 @@
 
 package jsx.webd.defaultpages;
 
-import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.SFile;
 import jsb.io.SInputStream;
+import jsb.webd.SSession;
 import jsx.webd.*;
 
 import java.io.ByteArrayOutputStream;
-import java.util.logging.Level;
 
-public class DefaultRawFilePage extends Page {
+public class DefaultRawFilePage extends MasterPage {
     public DefaultRawFilePage(WebDApi api) {
         super(api,"system.default_raw_file", "Default Raw File", "Default raw file page of StaroWebD.");
     }
@@ -50,7 +50,7 @@ public class DefaultRawFilePage extends Page {
     public boolean accepted(final jsb.webd.SSession session) {
         if (config().hasDefaultFileSystemPage()) return false;
 
-        FileItem item = new FileItem(sbObject(), session.uri());
+        FileItem item = new FileItem(api().blueprint(session).sbObject(), session.uri());
         if (item.kind().equalsIgnoreCase("not_found")) return false;
         if (item.kind().equalsIgnoreCase("folder")) return false;
 
@@ -79,15 +79,17 @@ public class DefaultRawFilePage extends Page {
     public PageResponse run(PageRequest request) {
         PageResponse ps = responsePattern().clone();
         try {
+            SSession session = (SSession)request.get("_session").value();
+
             String uri = request.get("uri").value().toString().substring(1);
             if (uri.endsWith("/")) {
                 uri = uri.substring(0, uri.length() - 1);
             }
             uri = "/" + uri;
-            FileItem item = new FileItem(sbObject(), uri);
+            FileItem item = new FileItem(api().blueprint(session).sbObject(), uri);
 
             if (item.kind().equalsIgnoreCase("file")) {
-                SFile file = sbObject().sandbox().machine().mnt().newFile(item.filepath());
+                SFile file = api().blueprint(session).sbObject().sandbox().machine().mnt().newFile(item.filepath());
                 SInputStream fis = file.inputStream();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[1024];
@@ -105,9 +107,8 @@ public class DefaultRawFilePage extends Page {
             }
             throw new Exception("Not recognized item.");
         } catch (Throwable e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

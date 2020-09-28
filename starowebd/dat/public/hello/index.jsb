@@ -13,7 +13,7 @@ function __exec__(data) {
 	args.put('name', name);
 	var output = util.newHashMap();
 	
-	webd.theme(output, '/hello/hello.vm', args);
+	webd.theme(session, output, '/hello/hello.vm', args);
 	
 	data.output(output);
 }

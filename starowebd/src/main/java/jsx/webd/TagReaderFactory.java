@@ -45,16 +45,12 @@ public abstract class TagReaderFactory {
         _dataset = dataset;
     }
 
-    public BluePrint blueprint() {
+    public final BluePrint blueprint() {
         return _blueprint;
     }
 
-    public DataSet dataset() {
+    public final DataSet dataset() {
         return _dataset;
-    }
-
-    public WebDApi api() {
-        return _blueprint.api();
     }
 
     public abstract com.starohub.platies.stream.TagJsonReader create(String code, String dsCode, String path, String json, Map args);

@@ -15,7 +15,7 @@ function __exec__(data) {
 	args.put('slug', slug);
 	var output = util.newHashMap();
 	
-	webd.theme(output, '/trial/redirect/post.vm', args);
+	webd.theme(session, output, '/trial/redirect/post.vm', args);
 	
 	data.output(output);
 }

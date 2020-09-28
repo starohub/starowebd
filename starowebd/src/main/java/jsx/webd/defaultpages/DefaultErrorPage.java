@@ -35,14 +35,14 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.*;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsx.webd.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultErrorPage extends Page {
-
+public class DefaultErrorPage extends MasterPage {
     public DefaultErrorPage(WebDApi api) {
         super(api,"system.default_error", "Default Error", "Default error page of StaroWebD.");
     }
@@ -85,7 +85,7 @@ public class DefaultErrorPage extends Page {
             theme(ps,"Error.vm", args);
         } catch (Exception e) {
             Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
+            platform().log("Failed to view page: " + Tool.stacktrace(e));
             Tool.copyError(ps, e);
         }
         return ps;

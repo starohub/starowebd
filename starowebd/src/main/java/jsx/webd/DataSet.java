@@ -34,9 +34,7 @@
 
 package jsx.webd;
 
-import com.starohub.jsb.DefaultFileSystem;
 import com.starohub.platies.Platies;
-import jsb.SFileSystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
@@ -59,17 +57,17 @@ public abstract class DataSet {
         _blueprint = blueprint;
         setInfo();
         _license = createLicense(blueprint, licFile);
-        createPages(blueprint.api());
-        _tagReaderFactory = createTagReaderFactory(blueprint.api(), blueprint, this);
+        createPages();
+        _tagReaderFactory = createTagReaderFactory(blueprint, this);
     }
 
-    protected abstract void createPages(WebDApi api);
+    protected abstract void createPages();
 
-    public jsx.seller.PSoftware license() {
+    public final jsx.seller.PSoftware license() {
         return _license;
     }
 
-    public BluePrint blueprint() {
+    public final BluePrint blueprint() {
         return _blueprint;
     }
 
@@ -80,43 +78,43 @@ public abstract class DataSet {
         return "{}";
     }
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    protected DataSet code(String src) {
+    protected final DataSet code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    protected DataSet name(String src) {
+    protected final DataSet name(String src) {
         _name = src;
         return this;
     }
 
-    public String version() {
+    public final String version() {
         return _version;
     }
 
-    protected DataSet version(String src) {
+    protected final DataSet version(String src) {
         _version = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    protected DataSet desc(String src) {
+    protected final DataSet desc(String src) {
         _desc = src;
         return this;
     }
 
-    public Map mergeMap(String code, String dsCode, String path, String data, Map args) throws Exception {
+    public final Map mergeMap(String code, String dsCode, String path, String data, Map args) throws Exception {
         String template = data;
         if (data == null) {
             template = new String(loadTemplate(dsCode, path), "UTF-8");
@@ -125,7 +123,7 @@ public abstract class DataSet {
         return jsonMap;
     }
 
-    public java.util.List mergeList(String code, String dsCode, String path, String data, Map args) throws Exception {
+    public final java.util.List mergeList(String code, String dsCode, String path, String data, Map args) throws Exception {
         String template = data;
         if (data == null) {
             template = new String(loadTemplate(dsCode, path), "UTF-8");
@@ -134,7 +132,7 @@ public abstract class DataSet {
         return jsonList;
     }
 
-    public String mergeJsonObject(String code, String dsCode, String path, String data, Map args) throws Exception {
+    public final String mergeJsonObject(String code, String dsCode, String path, String data, Map args) throws Exception {
         String template = data;
         if (data == null) {
             template = new String(loadTemplate(dsCode, path), "UTF-8");
@@ -144,7 +142,7 @@ public abstract class DataSet {
         return json;
     }
 
-    public String mergeJsonList(String code, String dsCode, String path, String data, Map args) throws Exception {
+    public final String mergeJsonList(String code, String dsCode, String path, String data, Map args) throws Exception {
         String template = data;
         if (data == null) {
             template = new String(loadTemplate(dsCode, path), "UTF-8");
@@ -154,7 +152,7 @@ public abstract class DataSet {
         return json;
     }
 
-    public String mergeHtml(String code, String path, String data, Map args) throws Exception {
+    public final String mergeHtml(String code, String path, String data, Map args) throws Exception {
         String template = data;
         if (data == null) {
             template = new String(loadTemplate(code, path), "UTF-8");
@@ -162,8 +160,8 @@ public abstract class DataSet {
         try {
             Velocity.init();
         } catch (Throwable e) {
-            if (blueprint().api().config().platform() != null) {
-                blueprint().api().config().platform().log(e);
+            if (blueprint().platform() != null) {
+                blueprint().platform().log(e);
             }
         }
         VelocityContext ctx = new VelocityContext();
@@ -175,13 +173,13 @@ public abstract class DataSet {
         return writer.toString();
     }
 
-    protected abstract TagReaderFactory createTagReaderFactory(WebDApi api, BluePrint blueprint, DataSet dataset);
+    protected abstract TagReaderFactory createTagReaderFactory(BluePrint blueprint, DataSet dataset);
 
     protected abstract byte[] loadResource(String code, String path);
 
     public abstract DataSet mergeFile(String code, String dsCode, String path, String data, Map args, String tagFile) throws Exception;
 
-    protected byte[] loadTemplate(String code, String path) {
+    protected final byte[] loadTemplate(String code, String path) {
         String filename = "/templates/" + path;
         return loadResource(code, filename);
     }

@@ -57,7 +57,7 @@ public class PageResponse {
         setup();
     }
 
-    protected PageResponse setup() {
+    private PageResponse setup() {
         put(new PageItem("_redirect", "Redirected URL", "URL to be redirected. NULL if not used.", String.class.getName(), null, null));
         put(new PageItem("_error", "Error Stacktrace", "Stacktrace of thrown exception. NULL if not used.", String.class.getName(), null, null));
         put(new PageItem("_return_list", "Returned Array List", "Array list which is returned. NULL if not used.", List.class.getName(), null, null));
@@ -74,25 +74,25 @@ public class PageResponse {
         return this;
     }
 
-    public boolean hiddenVisible() {
+    public final boolean hiddenVisible() {
         return _hiddenVisible;
     }
 
-    public PageResponse hiddenVisible(boolean src) {
+    public final PageResponse hiddenVisible(boolean src) {
         _hiddenVisible = src;
         return this;
     }
 
-    public boolean systemVisible() {
+    public final boolean systemVisible() {
         return _systemVisible;
     }
 
-    public PageResponse systemVisible(boolean src) {
+    public final PageResponse systemVisible(boolean src) {
         _systemVisible = src;
         return this;
     }
 
-    public boolean has(String code) {
+    public final boolean has(String code) {
         if (_items.containsKey(code)) {
             PageItem pi = _items.get(code);
             return pi.value() != null;
@@ -101,16 +101,16 @@ public class PageResponse {
         }
     }
 
-    public PageResponse put(PageItem src) {
+    public final PageResponse put(PageItem src) {
         _items.put(src.code(), src);
         return this;
     }
 
-    public PageItem get(String code) {
+    public final PageItem get(String code) {
         return _items.get(code);
     }
 
-    public List<String> items() {
+    public final List<String> items() {
         List<String> tag = new ArrayList<>();
         for (String key : _items.keySet()) {
             tag.add(key);
@@ -118,34 +118,34 @@ public class PageResponse {
         return tag;
     }
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    public PageResponse code(String src) {
+    public final PageResponse code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    public PageResponse name(String src) {
+    public final PageResponse name(String src) {
         _name = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    public PageResponse desc(String src) {
+    public final PageResponse desc(String src) {
         _desc = src;
         return this;
     }
 
-    public PageResponse clone() {
+    public final PageResponse clone() {
         PageResponse pr = new PageResponse(code(), name(), desc());
         List<String> items = items();
         for (int i = 0; i < items.size(); i++) {
@@ -155,7 +155,7 @@ public class PageResponse {
         return pr;
     }
 
-    public Map toMap() {
+    public final Map toMap() {
         Map tag = new HashMap();
         List<String> items = items();
         for (int i = 0; i < items.size(); i++) {
@@ -165,7 +165,7 @@ public class PageResponse {
         return tag;
     }
 
-    public PageResponse fromMap(Map src) {
+    public final PageResponse fromMap(Map src) {
         List<String> items = items();
         for (int i = 0; i < items.size(); i++) {
             PageItem pi = get(items.get(i));

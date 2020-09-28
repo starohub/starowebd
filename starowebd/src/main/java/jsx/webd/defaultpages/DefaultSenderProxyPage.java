@@ -35,6 +35,7 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
@@ -47,8 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultSenderProxyPage extends Page {
-
+public class DefaultSenderProxyPage extends MasterPage {
     public DefaultSenderProxyPage(WebDApi api) {
         super(api,"system.default_sender_proxy", "Default Sender Proxy", "Default sender proxy page of StaroWebD.");
     }
@@ -58,6 +58,9 @@ public class DefaultSenderProxyPage extends Page {
         if (vh == null) return false;
         if (!vh.hasPageProxy()) return false;
         if (!vh.hasPageSender()) return false;
+        if (!session.params().containsKey("token")) return false;
+        if (vh.proxyToken() == null) return false;
+        if (!vh.proxyToken().equals(session.params().get("token"))) return false;
         String path = session.uri();
         if ("/proxy.yo".equalsIgnoreCase(path)) {
             return true;
@@ -68,6 +71,7 @@ public class DefaultSenderProxyPage extends Page {
     protected PageRequest createRequestPattern() {
         PageRequest pr = new PageRequest("request." + code(), name(), desc(), "get", "/**");
         pr.put(new PageItem("req", "Request JSON", "Request JSON from proxy receiver.", "get", "", ""));
+        pr.put(new PageItem("token", "Token", "Token to use proxy.", "get", "", ""));
         return pr;
     }
 
@@ -89,10 +93,12 @@ public class DefaultSenderProxyPage extends Page {
         PageResponse ps = responsePattern().clone();
         try {
             SSession session = (SSession)request.get("_session").value();
+            VHost vh = config().vhostList().find(session.host());
             String reqJson = URLDecoder.decode(request.get("req").value() + "", "UTF-8");
             Map rqMap = Tool.jsonToMap(reqJson);
             Map sesMap = Tool.mapItemToMap(rqMap, "_session");
             session.fromMap(sesMap);
+            session.proxyHost(vh.host());
             java.util.List<String> keys = new ArrayList<>();
             for (String key : session.files().keySet()) {
                 if (key.startsWith("base64_")) {
@@ -125,9 +131,9 @@ public class DefaultSenderProxyPage extends Page {
                     uri = uri.substring(0, uri.length() - 1);
                 }
                 uri = "/resources/" + uri;
-                FileItem item = new FileItem(api().sbObject(), uri);
+                FileItem item = new FileItem(api().blueprint(session).sbObject(), uri);
                 if (!item.kind().equalsIgnoreCase("not_found")) {
-                    api().markup().renderFile(ps3, uri, item.mime());
+                    api().markup().renderFile(session, ps3, uri, item.mime());
                     Map resMap = ps3.toMap();
                     String resJson = Tool.toJson(resMap);
                     ps.get("res").value(resJson);
@@ -143,12 +149,11 @@ public class DefaultSenderProxyPage extends Page {
                 ps.get("res").value(resJson);
                 return ps;
             } else {
-                ps.get("res").value("\"null\"");
+                ps.get("res").value("null");
             }
         } catch (Throwable e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

@@ -34,25 +34,28 @@
 
 package jsx.webd.defaultpages;
 
-import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
-public class DefaultPasswordPage extends Page {
-
+public class DefaultPasswordPage extends MasterPage {
     public DefaultPasswordPage(WebDApi api) {
         super(api,"system.default_password", "Default Password Page", "Provide authentication.");
     }
 
     public boolean accepted(final SSession session) {
         VHost vh = config().vhostList().find(session.host());
-        if (vh == null) return false;
-        if (!vh.passwordProtected()) return false;
-        if (!api().sessionData().getOnline(session)) return false;
+        if (session.proxyHost() != null) {
+            vh = config().vhostList().find(session.proxyHost());
+            if (vh == null) return false;
+        } else {
+            if (vh == null) return false;
+            if (!vh.passwordProtected()) return false;
+            if (!api().sessionData().getOnline(session)) return false;
+        }
         String path = session.uri().toLowerCase();
         if (path.startsWith("/password.yo")) {
             return true;
@@ -97,13 +100,18 @@ public class DefaultPasswordPage extends Page {
             if ("POST".equalsIgnoreCase(session.method())) {
                 if (api().sessionData().getOnline(session)) {
                     VHost vh = config().vhostList().find(session.host());
+                    if (session.proxyHost() != null) {
+                        vh = config().vhostList().find(session.proxyHost());
+                    }
                     String username = api().sessionData().get(session, "username_" + vh.host(), "") + "";
                     if (username.length() > 0) {
                         VUser vu = vh.users().find(username);
                         if (vu != null) {
+                            vu = vu.clone();
                             vu.encrypted(true);
                             vu.password(vu.md5(password));
-                            vu.saveToFS(api());
+                            api().config().vhostList().masterHost().editUser(vu);
+                            api().config().vhostList().masterHost().saveUser(vu);
                             if (returnUrl == null || returnUrl.trim().length() == 0) {
                                 returnUrl = "/";
                             }
@@ -126,9 +134,8 @@ public class DefaultPasswordPage extends Page {
             args.put("message", message);
             theme(ps, "Password.vm", args);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

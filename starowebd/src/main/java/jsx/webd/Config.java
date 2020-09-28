@@ -35,6 +35,7 @@
 package jsx.webd;
 
 import com.starohub.webd.Tool;
+import jsb.webd.SSession;
 
 import java.io.File;
 import java.util.HashMap;
@@ -56,71 +57,41 @@ public class Config {
     private boolean _hasDefaultFileSystemPage = true;
     private boolean _hasDefaultAPIDocsPage = true;
     private boolean _hasDefaultIndexPage = true;
-    private boolean _hasPageSender = false;
-    private boolean _hasPageReceiver = false;
     private String _cfgReadonly = "{}";
     private String _cfgWritable = "{}";
     private String _cfgMounter = "{}";
     private Platform _platform = new Platform();
-    private String _blueprintClass = null;
-    private BluePrint _blueprint;
-    private String _blueprintLicense = null;
     private Map _more = new HashMap();
-    private String _proxyEndpoint = null;
     private VHostList _vhostList = new VHostList();
+    private int _maxWebDApi = 1;
 
-    public VHostList vhostList() {
+    public final int maxWebDApi() {
+        return _maxWebDApi;
+    }
+
+    public final Config maxWebDApi(int src) {
+        _maxWebDApi = src;
+        return this;
+    }
+
+    public final VHostList vhostList() {
         return _vhostList;
     }
 
-    /*
-    public String proxyEndpoint() {
-        return _proxyEndpoint;
-    }
-
-    public Config proxyEndpoint(String src) {
-        _proxyEndpoint = src;
-        return this;
-    }
-
-    public boolean hasPageProxy() {
-        return hasPageReceiver() || hasPageSender();
-    }
-
-    public boolean hasPageSender() {
-        return _hasPageSender;
-    }
-
-    public Config hasPageSender(boolean src) {
-        _hasPageSender = src;
-        return this;
-    }
-
-    public boolean hasPageReceiver() {
-        return _hasPageReceiver;
-    }
-
-    public Config hasPageReceiver(boolean src) {
-        _hasPageReceiver = src;
-        return this;
-    }
-
-     */
-
-    public boolean hasDefaultIndexPage() {
+    public final boolean hasDefaultIndexPage() {
         return _hasDefaultIndexPage;
     }
 
-    public Config hasDefaultIndexPage(boolean src) {
+    public final Config hasDefaultIndexPage(boolean src) {
         _hasDefaultIndexPage = src;
         return this;
     }
 
-    public Map more() {
+    public final Map more() {
         return _more;
     }
 
-    public Config more(Map src) {
+    public final Config more(Map src) {
         _more = src;
         return this;
     }
@@ -129,38 +100,11 @@ public class Config {
         _platform.config(this);
     }
 
-    public String blueprintLicense() {
-        return _blueprintLicense;
-    }
-
-    public Config blueprintLicense(String src) {
-        _blueprintLicense = src;
-        return this;
-    }
-
-    public BluePrint blueprint() {
-        return _blueprint;
-    }
-
-    public Config blueprint(BluePrint src) {
-        _blueprint = src;
-        return this;
-    }
-
-    public String blueprintClass() {
-        return _blueprintClass;
-    }
-
-    public Config blueprintClass(String src) {
-        _blueprintClass = src;
-        return this;
-    }
-
-    public Platform platform() {
+    public final Platform platform() {
         return _platform;
     }
 
-    public Config platform(Platform src) {
+    public final Config platform(Platform src) {
         _platform = src;
         if (_platform.config() == null) {
             _platform.config(this);
@@ -168,140 +112,147 @@ public class Config {
         return this;
     }
 
-    public String cfgReadonly() {
+    public final String cfgReadonly() {
         return _cfgReadonly;
     }
 
-    public Config cfgReadonly(String val) {
+    public final Config cfgReadonly(String val) {
         _cfgReadonly = val;
         return this;
     }
 
-    public String cfgWritable() {
+    public final String cfgWritable() {
         return _cfgWritable;
     }
 
-    public Config cfgWritable(String val) {
+    public final Config cfgWritable(String val) {
         _cfgWritable = val;
         return this;
     }
 
-    public String cfgMounter() {
+    public final String cfgMounter() {
         return _cfgMounter;
     }
 
-    public Config cfgMounter(String val) {
+    public final Config cfgMounter(String val) {
         _cfgMounter = val;
         return this;
     }
 
-    public boolean hasDefaultAPIDocsPage() {
+    public final boolean hasDefaultAPIDocsPage() {
         return _hasDefaultAPIDocsPage;
     }
 
-    public Config hasDefaultAPIDocsPage(boolean src) {
+    public final Config hasDefaultAPIDocsPage(boolean src) {
         _hasDefaultAPIDocsPage = src;
         return this;
     }
 
-    public boolean hasDefaultFileSystemPage() {
+    public final boolean hasDefaultFileSystemPage() {
         return _hasDefaultFileSystemPage;
     }
 
-    public Config hasDefaultFileSystemPage(boolean val) {
+    public final Config hasDefaultFileSystemPage(boolean val) {
         _hasDefaultFileSystemPage = val;
         return this;
     }
 
-    public boolean hasPublicIPPage() {
+    public final boolean hasPublicIPPage() {
         return _hasPublicIPPage;
     }
 
-    public Config hasPublicIPPage(boolean val) {
+    public final Config hasPublicIPPage(boolean val) {
         _hasPublicIPPage = val;
         return this;
     }
 
-    public boolean hasDefaultErrorPage() {
+    public final boolean hasDefaultErrorPage() {
         return _hasDefaultErrorPage;
     }
 
-    public Config hasDefaultErrorPage(boolean val) {
+    public final Config hasDefaultErrorPage(boolean val) {
         _hasDefaultErrorPage = val;
         return this;
     }
 
-    public boolean hasDefaultHomePage() {
+    public final boolean hasDefaultHomePage() {
         return _hasDefaultHomePage;
     }
 
-    public Config hasDefaultHomePage(boolean val) {
+    public final Config hasDefaultHomePage(boolean val) {
         _hasDefaultHomePage = val;
         return this;
     }
 
-    public boolean hasDefaultNotFoundPage() {
+    public final boolean hasDefaultNotFoundPage() {
         return _hasDefaultNotFoundPage;
     }
 
-    public Config hasDefaultNotFoundPage(boolean val) {
+    public final Config hasDefaultNotFoundPage(boolean val) {
         _hasDefaultNotFoundPage = val;
         return this;
     }
 
-    public PageFactory pageFactory() {
+    public final PageFactory pageFactory() {
         return _pageFactory;
     }
 
-    public Config pageFactory(PageFactory pageFactory) {
+    public final Config pageFactory(PageFactory pageFactory) {
         _pageFactory = pageFactory;
         return this;
     }
 
-    public int cookieExpires() {
+    public final int cookieExpires() {
         return _cookieExpires;
     }
 
-    public Config cookieExpires(int cookieExpires) {
+    public final Config cookieExpires(int cookieExpires) {
         _cookieExpires = cookieExpires;
         return this;
     }
 
-    public int threadCount() { return _threadCount; }
+    public final int threadCount() { return _threadCount; }
 
-    public Config threadCount(int count) {
+    public final Config threadCount(int count) {
         _threadCount = count;
         return this;
     }
 
-    public int apiPort() {
+    public final int apiPort() {
         return _apiPort;
     }
 
-    public Config apiPort(int apiPort) {
+    public final Config apiPort(int apiPort) {
         _apiPort = apiPort;
         return load();
     }
 
-    public String dataFolder() {
-        return _dataFolder;
+    public final String dataFolder(SSession session) {
+        if (session == null) return _dataFolder;
+        VHost vh = vhostList().find(session.host());
+        if (session.proxyHost() != null) {
+            vh = vhostList().find(session.proxyHost());
+        }
+        if (vh == null) return _dataFolder;
+        if (vh.dataFolder() == null) return _dataFolder;
+        return vh.dataFolder();
     }
 
-    public Config dataFolder(String dataFolder) {
+    public final Config dataFolder(String dataFolder) {
         _dataFolder = dataFolder;
         return load();
     }
 
-    public String stopSignalFile() {
+    public final String stopSignalFile() {
         return _stopSignalFile;
     }
 
-    public Config stopSignalFile(String filename) {
+    public final Config stopSignalFile(String filename) {
         _stopSignalFile = filename;
         return this;
     }
 
-    public Config load() {
+    public final Config load() {
         try {
             _stopSignalFile = new File(_dataFolder, "starowebd-" + apiPort() + ".stop").getAbsolutePath();
         } catch (Exception e) {
@@ -310,11 +261,11 @@ public class Config {
         return this;
     }
 
-    public jsb.webd.SSession session() {
+    public final jsb.webd.SSession session() {
         return _session;
     }
 
-    public Config session(jsb.webd.SSession session) {
+    public final Config session(jsb.webd.SSession session) {
         _session = session;
         return this;
     }

@@ -35,6 +35,8 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.*;
+import com.starohub.webd.sandbox.webd.MasterPage;
+import jsb.webd.SSession;
 import jsx.webd.*;
 
 import java.util.ArrayList;
@@ -43,8 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultApiDocsPage extends Page {
-
+public class DefaultApiDocsPage extends MasterPage {
     public DefaultApiDocsPage(WebDApi api) {
         super(api,"system.default_api_docs", "Default API Docs", "Default API documents page of StaroWebD.");
     }
@@ -84,52 +85,64 @@ public class DefaultApiDocsPage extends Page {
                 Page page = config().pageFactory().get(codes.get(i));
                 if (page == null) continue;
                 if (!page.docVisible()) continue;
-                Map p = new HashMap();
-                p.put("code", page.code());
-                p.put("name", page.name());
-                p.put("desc", page.desc());
-                p.put("uri", page.requestPattern().uri());
-                p.put("method", page.requestPattern().method());
-
-                List rq = new ArrayList();
-                List<String> items = page.requestPattern().items();
-                for (int j = 0; j < items.size(); j++) {
-                    String code = items.get(j);
-                    PageItem pi = page.requestPattern().get(code);
-                    if (pi.system() && !page.requestPattern().systemVisible()) {
-                        continue;
-                    }
-                    if (pi.hidden() && !page.requestPattern().hiddenVisible()) {
-                        continue;
-                    }
-                    rq.add(pi);
+                fillPage(api, page);
+            }
+            for (BluePrint blueprint : api().blueprintList()) {
+                codes = blueprint.pageFactory().pages();
+                for (int i = 0; i < codes.size(); i++) {
+                    Page page = config().pageFactory().get(codes.get(i));
+                    if (page == null) continue;
+                    if (!page.docVisible()) continue;
+                    fillPage(api, page);
                 }
-                p.put("request", rq);
-
-                List rs = new ArrayList();
-                items = page.responsePattern().items();
-                for (int j = 0; j < items.size(); j++) {
-                    String code = items.get(j);
-                    PageItem pi = page.responsePattern().get(code);
-                    if (pi.system() && !page.responsePattern().systemVisible()) {
-                        continue;
-                    }
-                    if (pi.hidden() && !page.responsePattern().hiddenVisible()) {
-                        continue;
-                    }
-                    rs.add(pi);
-                }
-                p.put("response", rs);
-                api.add(p);
             }
             args.put("api", api);
 
             theme(ps,"APIDocs.vm", args);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
+    }
+
+    protected void fillPage(List<Map> api, Page page) {
+        Map p = new HashMap();
+        p.put("code", page.code());
+        p.put("name", page.name());
+        p.put("desc", page.desc());
+        p.put("uri", page.requestPattern().uri());
+        p.put("method", page.requestPattern().method());
+
+        List rq = new ArrayList();
+        List<String> items = page.requestPattern().items();
+        for (int j = 0; j < items.size(); j++) {
+            String code = items.get(j);
+            PageItem pi = page.requestPattern().get(code);
+            if (pi.system() && !page.requestPattern().systemVisible()) {
+                continue;
+            }
+            if (pi.hidden() && !page.requestPattern().hiddenVisible()) {
+                continue;
+            }
+            rq.add(pi);
+        }
+        p.put("request", rq);
+
+        List rs = new ArrayList();
+        items = page.responsePattern().items();
+        for (int j = 0; j < items.size(); j++) {
+            String code = items.get(j);
+            PageItem pi = page.responsePattern().get(code);
+            if (pi.system() && !page.responsePattern().systemVisible()) {
+                continue;
+            }
+            if (pi.hidden() && !page.responsePattern().hiddenVisible()) {
+                continue;
+            }
+            rs.add(pi);
+        }
+        p.put("response", rs);
+        api.add(p);
     }
 }

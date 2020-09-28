@@ -35,20 +35,19 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import com.starohub.webd.sandbox.webd.PseudoSession;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
-import java.util.logging.Level;
-
-public class DefaultRedirectPage extends Page {
+public class DefaultRedirectPage extends MasterPage {
     public DefaultRedirectPage(WebDApi api) {
         super(api,"system.default_redirect", "Default Redirect", "Default redirect page of StaroWebD.");
     }
 
     public boolean accepted(final jsb.webd.SSession session) {
         String uri = session.uri();
-        String newUri = api().redirect().redirect(uri);
+        String newUri = api().blueprint(session).redirect().redirect(uri);
         if (newUri == null) return false;
         return true;
     }
@@ -77,16 +76,16 @@ public class DefaultRedirectPage extends Page {
         try {
             SSession css = (SSession)request.get("_session").value();
             String uri = request.get("uri").value().toString();
-            String newUri = api().redirect().redirect(uri);
+            String newUri = api().blueprint(css).redirect().redirect(uri);
             if (newUri != null) {
                 SSession pss = new PseudoSession(api(), css, newUri, css.method(), css.host(), css.port(), css.headers(), css.params(), css.files(), css.sessionId());
+                pss.proxyHost(css.proxyHost());
                 return api().originPageFactory().run(pss);
             }
             throw new Exception("Not recognized item.");
         } catch (Throwable e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

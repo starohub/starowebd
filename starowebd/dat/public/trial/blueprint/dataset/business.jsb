@@ -13,7 +13,7 @@ function __exec__(data) {
 	args.put('name', name);
 	var output = util.newHashMap();
 	
-	var dts = webd.blueprint().dataSet("com.starohub.trial.dataset");
+	var dts = webd.blueprint(session).dataset("com.starohub.trial.dataset");
 	var json = dts.mergeJsonObject('buyer', 'common', 'buyer.json', null, args);
 	args.put('buyer', json);
 	

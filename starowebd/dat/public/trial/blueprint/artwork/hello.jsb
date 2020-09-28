@@ -13,7 +13,7 @@ function __exec__(data) {
 	args.put('name', name);
 	var output = util.newHashMap();
 	
-	var atw = webd.blueprint().artWork("com.starohub.trial.artwork");
+	var atw = webd.blueprint(session).artwork("com.starohub.trial.artwork");
 	output.put('_return_html', atw.mergeHtml('common', 'hello.vm', null, args));
 	
 	data.output(output);

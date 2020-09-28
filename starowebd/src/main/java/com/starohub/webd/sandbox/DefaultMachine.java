@@ -35,14 +35,15 @@
 package com.starohub.webd.sandbox;
 
 import jsb.SModuleStore;
+import jsb.webd.SSession;
 import jsx.webd.Config;
 import jsx.webd.WebDApi;
 
 import java.util.Map;
 
 public class DefaultMachine extends jsb.SMachine {
-    public DefaultMachine(WebDApi api, Map more) {
-        super(api.config().dataFolder(), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
+    public DefaultMachine(WebDApi api, SSession session, Map more) {
+        super(api.config().dataFolder(session), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
         if (more.containsKey("license.debug")) {
             cfg().set("license.debug", more.get("license.debug") + "");
         }

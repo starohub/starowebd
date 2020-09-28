@@ -35,6 +35,7 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
@@ -45,8 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultReceiverProxyPage extends Page {
-
+public class DefaultReceiverProxyPage extends MasterPage {
     public DefaultReceiverProxyPage(WebDApi api) {
         super(api,"system.default_receiver_proxy", "Default Receiver Proxy", "Default receiver proxy page of StaroWebD.");
     }
@@ -127,9 +127,8 @@ public class DefaultReceiverProxyPage extends Page {
             }
             return ps;
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

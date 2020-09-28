@@ -33,7 +33,7 @@ function __exec__(data) {
 	args.put('method', session.method());
 	args.put('sessionId', session.sessionId());
 	
-	webd.theme(output, '/trial/upload/index.vm', args);
+	webd.theme(session, output, '/trial/upload/index.vm', args);
 	
 	data.output(output);
 }

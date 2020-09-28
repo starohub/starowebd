@@ -36,10 +36,12 @@ package jsx.webd;
 
 import com.starohub.jsb.SBObject;
 import com.starohub.webd.*;
+import jsb.io.SException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
@@ -51,10 +53,10 @@ public abstract class Page {
     private PageRequest _requestPattern;
     private PageResponse _responsePattern;
     private boolean _docVisible;
-    private WebDApi _api;
+    private BluePrint _blueprint;
 
-    public Page(WebDApi api, String code, String name, String desc) {
-        _api = api;
+    public Page(BluePrint bluePrint, String code, String name, String desc) {
+        _blueprint = bluePrint;
         _code = code;
         _name = name;
         _desc = desc;
@@ -63,81 +65,80 @@ public abstract class Page {
         _docVisible = false;
     }
 
-    public WebDApi api() {
-        return _api;
+    protected final BluePrint blueprint() {
+        return _blueprint;
     }
 
-    protected SBObject sbObject() {
-        return api().sbObject();
+    protected final SBObject sbObject() {
+        return _blueprint.sbObject();
     }
 
-    public boolean docVisible() {
+    public final boolean docVisible() {
         return _docVisible;
     }
 
-    public Page docVisible(boolean src) {
+    public final Page docVisible(boolean src) {
         _docVisible = src;
         return this;
     }
 
-    protected PageRequest createRequestPattern() {
-        return null;
-    }
+    protected abstract PageRequest createRequestPattern();
 
-    protected PageResponse createResponsePattern() {
-        return null;
-    }
+    protected abstract PageResponse createResponsePattern();
 
-    public PageRequest requestPattern() {
+    public final PageRequest requestPattern() {
         return _requestPattern;
     }
 
-    public Page requestPattern(PageRequest pr) {
+    public final Page requestPattern(PageRequest pr) {
         _requestPattern = pr;
         return this;
     }
 
-    public PageResponse responsePattern() {
+    public final PageResponse responsePattern() {
         return _responsePattern;
     }
 
-    public Page responsePattern(PageResponse ps) {
+    public final Page responsePattern(PageResponse ps) {
         _responsePattern = ps;
         return this;
     }
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    public Page code(String src) {
+    public final Page code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    public Page name(String src) {
+    public final Page name(String src) {
         _name = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    public Page desc(String src) {
+    public final Page desc(String src) {
         _desc = src;
         return this;
     }
 
-    public Config config() {
-        return api().config();
+    protected Platform platform() {
+        if (blueprint() != null) {
+            return blueprint().platform();
+        }
+        return null;
     }
 
-    public boolean accepted(final String code) {
+    public final boolean accepted(final String code) {
         return _code.equalsIgnoreCase(code);
     }
 
@@ -147,21 +148,23 @@ public abstract class Page {
 
     public abstract PageResponse run(PageRequest request);
 
-    protected void theme(PageResponse output, String template, Map args) throws Exception {
+    protected final Page theme(PageResponse output, String template, Map args) throws Exception {
         output.get("_return_html").value(merge(template, args));
+        return this;
     }
 
-    protected void theme(Map outputMap, String template, Map args) throws Exception {
+    protected final Page theme(Map outputMap, String template, Map args) throws Exception {
         outputMap.put("_return_html", merge(template, args));
+        return this;
     }
 
-    protected String merge(String path, Map args) throws Exception {
+    protected final String merge(String path, Map args) throws Exception {
         String template = new String(loadTemplate(path), "UTF-8");
         try {
             Velocity.init();
         } catch (Throwable e) {
-            if (config().platform() != null) {
-                config().platform().log(e);
+            if (platform() != null) {
+                platform().log(e);
             }
         }
         VelocityContext ctx = new VelocityContext();
@@ -173,12 +176,12 @@ public abstract class Page {
         return writer.toString();
     }
 
-    protected String mergeHtml(String template, Map args) throws Exception {
+    protected final String mergeHtml(String template, Map args) throws Exception {
         try {
             Velocity.init();
         } catch (Throwable e) {
-            if (config().platform() != null) {
-                config().platform().log(e);
+            if (platform() != null) {
+                platform().log(e);
             }
         }
         VelocityContext ctx = new VelocityContext();
@@ -190,13 +193,81 @@ public abstract class Page {
         return writer.toString();
     }
 
-    protected byte[] loadResource(String path) {
-        Class clazz = WebDApi.class;
-        return Tool.loadResource(clazz, path);
+    protected Class createResourceClass() {
+        return Page.class;
     }
 
-    protected byte[] loadTemplate(String path) {
+    protected final byte[] loadResource(String path) {
+        return Tool.loadResource(createResourceClass(), path);
+    }
+
+    protected final byte[] loadTemplate(String path) {
         String filename = "/templates/" + path;
         return loadResource(filename);
+    }
+
+    protected final String stacktrace(Exception e) {
+        return Tool.stacktrace(e);
+    }
+
+    protected final String stacktrace(Throwable e) {
+        return Tool.stacktrace(e);
+    }
+
+    protected final boolean hasError(Map inputMap) {
+        return Tool.hasError(inputMap);
+    }
+
+    protected final Page copyError(Map src, Map tag) {
+        Tool.copyError(src, tag);
+        return this;
+    }
+
+    protected final Page copyError(PageResponse src, Exception e) {
+        Tool.copyError(src, e);
+        return this;
+    }
+
+    protected final Page copyError(PageResponse src, Throwable e) {
+        Tool.copyError(src, e);
+        return this;
+    }
+
+    protected final Page copyError(Map src, Exception e) {
+        Tool.copyError(src, e);
+        return this;
+    }
+
+    protected final Page copyError(Map src, Throwable e) {
+        Tool.copyError(src, e);
+        return this;
+    }
+
+    protected final Page log(Throwable e) {
+        if (platform() != null) {
+            platform().log(e);
+        }
+        return this;
+    }
+
+    protected final Page log(Exception e) {
+        if (platform() != null) {
+            platform().log(e);
+        }
+        return this;
+    }
+
+    protected final Page log(SException e) {
+        if (platform() != null) {
+            platform().log(e);
+        }
+        return this;
+    }
+
+    protected final Page log(String line) {
+        if (platform() != null) {
+            platform().log(line);
+        }
+        return this;
     }
 }

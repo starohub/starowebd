@@ -34,11 +34,6 @@
 
 package jsx.webd;
 
-import com.starohub.jsb.DefaultFileSystem;
-import jsb.SFileSystem;
-
-import java.io.File;
-
 public abstract class Kernel {
     private jsx.seller.PSoftware _license;
     private BluePrint _blueprint;
@@ -52,53 +47,53 @@ public abstract class Kernel {
         _blueprint = blueprint;
         setInfo();
         _license = createLicense(blueprint, licFile);
-        createPages(blueprint.api());
+        createPages();
     }
 
-    public jsx.seller.PSoftware license() {
+    public final jsx.seller.PSoftware license() {
         return _license;
     }
 
-    public BluePrint blueprint() {
+    public final BluePrint blueprint() {
         return _blueprint;
     }
 
     protected abstract void setInfo();
-    protected abstract void createPages(WebDApi api);
+    protected abstract void createPages();
     protected abstract jsx.seller.PSoftware createLicense(BluePrint blueprint, String licFile);
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    protected Kernel code(String src) {
+    protected final Kernel code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    protected Kernel name(String src) {
+    protected final Kernel name(String src) {
         _name = src;
         return this;
     }
 
-    public String version() {
+    public final String version() {
         return _version;
     }
 
-    protected Kernel version(String src) {
+    protected final Kernel version(String src) {
         _version = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    protected Kernel desc(String src) {
+    protected final Kernel desc(String src) {
         _desc = src;
         return this;
     }

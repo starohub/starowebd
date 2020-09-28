@@ -40,25 +40,27 @@ import com.starohub.webd.Tool;
 import com.starohub.webd.WebD;
 import com.starohub.webd.sandbox.DefaultSBObject;
 import com.starohub.webd.sandbox.webd.DefaultSession;
+import com.starohub.webd.sandbox.webd.MasterPageFactory;
+import com.starohub.webd.sandbox.webd.PseudoSession;
+import jsb.webd.SSession;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Constructor;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
 
 public class WebDApi extends WebD {
     private Config _config;
     private PageFactory _pageFactory;
-    private BluePrint _blueprint;
-    private Redirect _redirect;
+    private Map<String, BluePrint> _blueprintMap = new HashMap<>();
     private Markup _markup;
     private SessionData _sessionData;
-    private SBObject _sbobject;
+    private Map<String, SBObject> _sbObjectMap = new HashMap<>();
     private Map _more;
     private PageFactory _senderPageFactory;
     private PageFactory _receiverPageFactory;
     private PageFactory _originPageFactory;
+    private static int __maxWebApi = -1;
 
     public Map more() {
         return _more;
@@ -82,6 +84,15 @@ public class WebDApi extends WebD {
 
     public WebDApi(Config config, Map more) {
         super(config.apiPort());
+        if (__maxWebApi < 0) {
+            if (config.maxWebDApi() > 0) {
+                __maxWebApi = config.maxWebDApi();
+            }
+        }
+        if (__maxWebApi == 0) {
+            throw new Error("Maximum WebD instance reached!");
+        }
+        __maxWebApi--;
         _more = more;
         _more.put("api", this);
         _config = config;
@@ -95,22 +106,10 @@ public class WebDApi extends WebD {
         _receiverPageFactory = createReceiverPageFactory();
         _originPageFactory = createOriginPageFactory();
         _config.pageFactory(_pageFactory);
-        _sbobject = createSBObject(more());
-        _blueprint = createBlueprint(_config);
-        _redirect = createRedirect();
         _markup = createMarkup();
         _sessionData = createSessionData();
-        syncVUsers();
     }
 
-    protected WebDApi syncVUsers() {
-        for (VHost h : config().vhostList().hosts()) {
-            for (VUser u : h.users().users()) {
-                u.fromMap(this, u.toMap());
-            }
-        }
-        return this;
-    }
     public WebDApi addPage(Page p) {
         _pageFactory.add(p);
         return this;
@@ -120,28 +119,37 @@ public class WebDApi extends WebD {
 
     protected Markup createMarkup() { return new jsx.webd.Markup(this); }
 
-    protected Redirect createRedirect() {
-        return new jsx.webd.Redirect(this);
-    }
-
-    protected BluePrint createBlueprint(Config config) {
+    protected BluePrint createBlueprint(SSession session) {
         try {
-            if (config.blueprintClass() != null) {
-                Class<?> clazz = Class.forName(config.blueprintClass());
-                Class<? extends BluePrint> newClass = clazz.asSubclass(BluePrint.class);
-                for (Constructor<?> ctor : newClass.getConstructors()) {
-                    Class<?>[] paramTypes = ctor.getParameterTypes();
-                    if (1 == paramTypes.length) {
-                        BluePrint bp = (BluePrint) ctor.newInstance((WebDApi)this);
+            VHost vh = config().vhostList().find(session.host());
+            if (session.proxyHost() != null) {
+                vh = config().vhostList().find(session.proxyHost());
+            }
+            if (vh == null) return null;
+            if (vh.blueprintClass() == null) return null;
+            if (vh.blueprintLicense() == null) return null;
+            if (!sbObject(session).sandbox().machine().mnt().newFile(vh.blueprintLicense()).exists()) return null;
+            Class<?> clazz = Class.forName(vh.blueprintClass());
+            Class<? extends BluePrint> newClass = clazz.asSubclass(BluePrint.class);
+            for (Constructor<?> ctor : newClass.getConstructors()) {
+                Class<?>[] paramTypes = ctor.getParameterTypes();
+                if (1 == paramTypes.length) {
+                    Map more = new HashMap();
+                    more.put("api", this);
+                    more.put("session", session);
+                    more.put("host", vh);
+                    more.put("platform", config().platform());
+                    BluePrint bp = (BluePrint) ctor.newInstance((Map)more);
 
-                        if (bp.license() != null && bp.license().valid()) {
-                            return bp;
-                        }
+                    if (bp.license() != null && bp.license().valid()) {
+                        return bp;
                     }
                 }
             }
         } catch (Throwable e) {
-            Tool.LOG.severe("Failed to load blueprint: " + Tool.stacktrace(e));
+            if (config().platform() != null) {
+                config().platform().log("Failed to load blueprint: " + Tool.stacktrace(e));
+            }
         }
         return null;
     }
@@ -150,23 +158,54 @@ public class WebDApi extends WebD {
 
     public Markup markup() { return _markup; }
 
-    public Redirect redirect() { return _redirect; }
-
-    public BluePrint blueprint() {
-        return _blueprint;
+    public List<BluePrint> blueprintList() {
+        List<BluePrint> tag = new ArrayList<>();
+        for (String key : _blueprintMap.keySet()) {
+            tag.add(_blueprintMap.get(key));
+        }
+        return tag;
     }
 
-    public SBObject sbObject() {
-        return _sbobject;
+    public BluePrint blueprint(SSession session) {
+        if (session == null) return null;
+        VHost vh = config().vhostList().find(session.host());
+        if (session.proxyHost() != null) {
+            vh = config().vhostList().find(session.proxyHost());
+        }
+        if (vh == null) return null;
+        if (!_blueprintMap.containsKey(vh.host())) {
+            _blueprintMap.put(vh.host(), createBlueprint(session));
+        }
+        return _blueprintMap.get(vh.host());
+    }
+
+    public SBObject sbObject(SSession session) {
+        Map more = new HashMap();
+        for (Object key : more().keySet()) {
+            more.put(key, more().get(key));
+        }
+        if (session == null) {
+            SSession defaultSession = new PseudoSession(this, new DefaultSession(this, null), "/start.jsb", "localhost", config().apiPort(), UUID.randomUUID().toString().replaceAll("-", ""));
+            more.put("session", defaultSession);
+            String js = "function __exec__(data) {}";
+            return new DefaultSBObject(js, 60, this, defaultSession, more);
+        };
+        more.put("session", session);
+        VHost vh = config().vhostList().find(session.host());
+        if (session.proxyHost() != null) {
+            vh = config().vhostList().find(session.proxyHost());
+        }
+        if (vh == null) return null;
+        vh.session(session);
+        if (!_sbObjectMap.containsKey(vh.host())) {
+            String js = "function __exec__(data) {}";
+            _sbObjectMap.put(vh.host(), new DefaultSBObject(js, 60, this, session, more));
+        }
+        return _sbObjectMap.get(vh.host());
     }
 
     public Config config() {
         return _config;
-    }
-
-    protected SBObject createSBObject(Map more) {
-        String js = "function __exec__(data) {}";
-        return new DefaultSBObject(js, 60, this, more);
     }
 
     protected byte[] loadResource(String path) {
@@ -175,19 +214,19 @@ public class WebDApi extends WebD {
     }
 
     protected PageFactory createOriginPageFactory() {
-        return new PageFactory(this, true, false, false);
+        return new MasterPageFactory(this, true, false, false);
     }
 
     protected PageFactory createSenderPageFactory() {
-        return new PageFactory(this, false, true, false);
+        return new MasterPageFactory(this, false, true, false);
     }
 
     protected PageFactory createReceiverPageFactory() {
-        return new PageFactory(this, false, false, true);
+        return new MasterPageFactory(this, false, false, true);
     }
 
     protected PageFactory createPageFactory() {
-        return new PageFactory(this, false, false, false);
+        return new MasterPageFactory(this, false, false, false);
     }
 
     protected jsb.webd.SSession createSession(Object source) {
@@ -253,8 +292,9 @@ public class WebDApi extends WebD {
                 }
             }
         } catch (Throwable t) {
-            Tool.LOG.log(Level.SEVERE, "Failed to handle page: ", t);
-            config().platform().log("Failed to handle page: " + Tool.stacktrace(t));
+            if (config().platform() != null) {
+                config().platform().log("Failed to handle page: " + Tool.stacktrace(t));
+            }
             return errorResponse(source, t);
         }
 

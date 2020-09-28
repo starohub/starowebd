@@ -37,26 +37,23 @@ package jsb.webd;
 import jsb.SCustomVisiblePatternStore;
 import jsb.SDefaultVisiblePatternStore;
 import jsx.webd.BluePrint;
-import jsx.webd.WebDApi;
-
-import java.util.ArrayList;
+import jsx.webd.Redirect;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class SBluePrint {
     private jsb.webd.SPackage _pkg;
-    private WebDApi _api;
     private BluePrint _blueprint;
     private Map<String, SArtWork> _artworkMap = new HashMap<>();
     private Map<String, SDataSet> _datasetMap = new HashMap<>();
     private Map<String, SKernel> _kernelMap = new HashMap<>();
     private SDefaultVisiblePatternStore _defaultVisibleStore;
     private SCustomVisiblePatternStore _customVisibleStore;
+    private SRedirect _redirect;
 
-    public SBluePrint(jsb.webd.SPackage pkg, WebDApi api, BluePrint blueprint) {
+    public SBluePrint(jsb.webd.SPackage pkg, BluePrint blueprint) {
         _pkg = pkg;
-        _api = api;
         _blueprint = blueprint;
         _defaultVisibleStore = new SDefaultVisiblePatternStore();
         _customVisibleStore = new SCustomVisiblePatternStore();
@@ -64,30 +61,26 @@ public abstract class SBluePrint {
         createArtWorkMap(_artworkMap);
         createDataSetMap(_datasetMap);
         createKernelMap(_kernelMap);
+        _redirect = createRedirect(pkg, blueprint.redirect());
     }
 
-    protected BluePrint blueprint() {
+    public final SRedirect redirect() { return _redirect; }
+
+    protected abstract SRedirect createRedirect(jsb.webd.SPackage pkg, Redirect redirect);
+
+    protected final BluePrint blueprint() {
         return _blueprint;
     }
 
-    public jsb.webd.SPackage pkg() {
+    public final jsb.webd.SPackage pkg() {
         return _pkg;
     }
 
-    protected WebDApi api() {
-        return _api;
+    public final List<String> datasetList() {
+        return blueprint().dataSetList();
     }
 
-    public boolean available() {
-        return api().blueprint() != null;
-    }
-
-    public List<String> dataSetList() {
-        if (!available()) return new ArrayList<>();
-        return api().blueprint().dataSetList();
-    }
-
-    public SDataSet dataSet(String code) {
+    public final SDataSet dataset(String code) {
         if (_datasetMap.containsKey(code)) {
             return _datasetMap.get(code);
         } else {
@@ -95,12 +88,11 @@ public abstract class SBluePrint {
         }
     }
 
-    public List<String> artWorkList() {
-        if (!available()) return new ArrayList<>();
-        return api().blueprint().artWorkList();
+    public final List<String> artworkList() {
+        return blueprint().artworkList();
     }
 
-    public SArtWork artWork(String code) {
+    public final SArtWork artwork(String code) {
         if (_artworkMap.containsKey(code)) {
             return _artworkMap.get(code);
         } else {
@@ -108,12 +100,11 @@ public abstract class SBluePrint {
         }
     }
 
-    public List<String> kernelList() {
-        if (!available()) return new ArrayList<>();
-        return api().blueprint().kernelList();
+    public final List<String> kernelList() {
+        return blueprint().kernelList();
     }
 
-    public SKernel kernel(String code) {
+    public final SKernel kernel(String code) {
         if (_kernelMap.containsKey(code)) {
             return _kernelMap.get(code);
         } else {
@@ -163,14 +154,14 @@ public abstract class SBluePrint {
 
         List<String> codes;
 
-        codes = artWorkList();
+        codes = artworkList();
         for (String code : codes) {
-            if (artWork(code).visibleToScripts(className)) return true;
+            if (artwork(code).visibleToScripts(className)) return true;
         }
 
-        codes = dataSetList();
+        codes = datasetList();
         for (String code : codes) {
-            if (dataSet(code).visibleToScripts(className)) return true;
+            if (dataset(code).visibleToScripts(className)) return true;
         }
 
         codes = kernelList();
@@ -181,20 +172,20 @@ public abstract class SBluePrint {
         return false;
     }
 
-    public boolean invisibleToScripts(String className) {
+    public final boolean invisibleToScripts(String className) {
         if (_defaultVisibleStore.invisibleToScripts(className)) return true;
         if (_customVisibleStore.invisibleToScripts(className)) return true;
 
         List<String> codes;
 
-        codes = artWorkList();
+        codes = artworkList();
         for (String code : codes) {
-            if (artWork(code).invisibleToScripts(className)) return true;
+            if (artwork(code).invisibleToScripts(className)) return true;
         }
 
-        codes = dataSetList();
+        codes = datasetList();
         for (String code : codes) {
-            if (dataSet(code).invisibleToScripts(className)) return true;
+            if (dataset(code).invisibleToScripts(className)) return true;
         }
 
         codes = kernelList();

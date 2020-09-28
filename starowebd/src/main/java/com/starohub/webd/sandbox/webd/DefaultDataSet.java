@@ -34,11 +34,12 @@
 
 package com.starohub.webd.sandbox.webd;
 
+import jsb.webd.SBluePrint;
 import jsb.webd.SPackage;
-import jsx.webd.WebDApi;
+import jsx.webd.DataSet;
 
 public class DefaultDataSet extends jsb.webd.SDataSet {
-    public DefaultDataSet(SPackage pkg, WebDApi api, jsx.webd.DataSet dataset) {
-        super(pkg, api, dataset);
+    public DefaultDataSet(SPackage pkg, SBluePrint blueprint, DataSet dataset) {
+        super(pkg, blueprint, dataset);
     }
 }

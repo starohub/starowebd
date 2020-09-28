@@ -9,7 +9,7 @@ function __exec__(data) {
 	var args = util.newHashMap();
 	var output = util.newHashMap();
 	
-	webd.theme(output, '/trial/redirect/index.vm', args);
+	webd.theme(session, output, '/trial/redirect/index.vm', args);
 	
 	data.output(output);
 }

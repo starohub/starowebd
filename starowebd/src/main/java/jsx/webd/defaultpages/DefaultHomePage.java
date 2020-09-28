@@ -35,13 +35,14 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.*;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsx.webd.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultHomePage extends Page {
+public class DefaultHomePage extends MasterPage {
     public DefaultHomePage(WebDApi api) {
         super(api,"system.default_home", "Default Home", "Default home page of StaroWebD.");
     }
@@ -51,7 +52,7 @@ public class DefaultHomePage extends Page {
         String path = session.uri().toLowerCase();
         if ("/".equalsIgnoreCase(path) || "/index.yo".equalsIgnoreCase(path)) {
             if (config().hasDefaultFileSystemPage()) {
-                FileItem webDir = new FileItem(sbObject(), "/");
+                FileItem webDir = new FileItem(api().blueprint(session).sbObject(), "/");
                 if (!webDir.kind().equalsIgnoreCase("not_found")) {
                     return false;
                 }
@@ -82,9 +83,8 @@ public class DefaultHomePage extends Page {
             Map args = new HashMap();
             theme(ps,"Home.vm", args);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

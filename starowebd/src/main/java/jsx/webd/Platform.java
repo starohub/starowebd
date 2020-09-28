@@ -35,6 +35,8 @@
 package jsx.webd;
 
 import com.starohub.webd.Tool;
+import jsb.io.SException;
+import jsb.webd.SSession;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -63,8 +65,18 @@ public class Platform {
         return Base64.getDecoder().decode(src);
     }
 
+    public Platform log(Exception e) {
+        log("==> Exception: " + Tool.stacktrace(e));
+        return this;
+    }
+
+    public Platform log(SException e) {
+        log("==> SException: " + Tool.stacktrace(e));
+        return this;
+    }
+
     public Platform log(Throwable e) {
-        log(Tool.stacktrace(e));
+        log("==> Throwable: " + Tool.stacktrace(e));
         return this;
     }
 
@@ -76,9 +88,9 @@ public class Platform {
     protected Platform saveLog(String line) {
         try {
             if (config() != null) {
-                if (config().dataFolder() != null) {
-                    if (new File(config().dataFolder()).exists()) {
-                        String logFile = new File(config().dataFolder(), "StaroWebD.txt").getAbsolutePath();
+                if (config().dataFolder((SSession)null) != null) {
+                    if (new File(config().dataFolder((SSession)null)).exists()) {
+                        String logFile = new File(config().dataFolder((SSession)null), "StaroWebD.txt").getAbsolutePath();
                         if (new File(logFile).exists()) {
                             FileOutputStream fos = new FileOutputStream(logFile, true);
                             fos.write(("\n" + line).getBytes("UTF-8"));
@@ -105,7 +117,7 @@ public class Platform {
             if (vh != null && vh.proxyEndpoint() != null) {
                 String url = vh.proxyEndpoint();
                 HttpURLConnection conn = (HttpURLConnection)(new URL(url)).openConnection();
-                String urlParameters  = "req=" + URLEncoder.encode(reqJson, "UTF-8");
+                String urlParameters  = "token=" + URLEncoder.encode(vh.proxyToken(), "UTF-8") + "&req=" + URLEncoder.encode(reqJson, "UTF-8");
                 byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
                 int    postDataLength = postData.length;
                 conn.setDoOutput( true );

@@ -41,30 +41,24 @@ import jsx.webd.WebDApi;
 
 public class SRedirect {
     private jsb.webd.SPackage _pkg;
-    private WebDApi _api;
     private Redirect _redirect;
     private SDefaultVisiblePatternStore _defaultVisibleStore;
     private SCustomVisiblePatternStore _customVisibleStore;
 
-    public SRedirect(jsb.webd.SPackage pkg, WebDApi api, Redirect redirect) {
+    public SRedirect(jsb.webd.SPackage pkg, Redirect redirect) {
         _pkg = pkg;
-        _api = api;
         _redirect = redirect;
         _defaultVisibleStore = new SDefaultVisiblePatternStore();
         _customVisibleStore = new SCustomVisiblePatternStore();
         setupVisible();
     }
 
-    protected Redirect redirect() {
+    protected final Redirect redirect() {
         return _redirect;
     }
 
-    public jsb.webd.SPackage pkg() {
+    public final jsb.webd.SPackage pkg() {
         return _pkg;
-    }
-
-    protected WebDApi api() {
-        return _api;
     }
 
     protected final SRedirect defaultVisible(String pattern, boolean startsWith) {
@@ -111,23 +105,23 @@ public class SRedirect {
         return false;
     }
 
-    public String findJSRFile(String uri) {
+    public final String findJSRFile(String uri) {
         return redirect().findJSRFile(uri);
     }
 
-    public String redirect(String uri) {
+    public final String redirect(String uri) {
         return redirect().redirect(uri);
     }
 
-    public String redirect(String jsrFile, String uri) {
+    public final String redirect(String jsrFile, String uri) {
         return redirect().redirect(jsrFile, uri);
     }
 
-    public String rootURI(String uri) {
+    public final String rootURI(String uri) {
         return redirect().rootURI(uri);
     }
 
-    public String rootJSR(String jsrFile) {
+    public final String rootJSR(String jsrFile) {
         return redirect().rootJSR(jsrFile);
     }
 }

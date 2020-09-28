@@ -34,127 +34,22 @@
 
 package jsx.webd;
 
-import jsb.webd.SSession;
-import jsx.webd.defaultpages.*;
-
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PageFactory {
+   private List<Page> _pageList = new ArrayList<Page>();
+    private BluePrint _blueprint;
 
-    private WebDApi _api;
-    private List<Page> _pageList = new ArrayList<Page>();
-    private boolean _hasPageSender;
-    private boolean _hasPageReceiver;
-    private boolean _hasPageOrigin;
-
-    public PageFactory(WebDApi api) {
-        this(api, false, false, false);
+    public PageFactory(BluePrint bluePrint) {
+        _blueprint = bluePrint;
     }
 
-    public PageFactory(WebDApi api, boolean hasPageOrigin, boolean hasPageSender, boolean hasPageReceiver) {
-        _api = api;
-        _hasPageOrigin = hasPageOrigin;
-        _hasPageReceiver = hasPageReceiver;
-        _hasPageSender = hasPageSender;
-        load();
+    public final BluePrint blueprint() {
+        return _blueprint;
     }
 
-    public boolean hasPageOrigin() {
-        return _hasPageOrigin;
-    }
-
-    public boolean hasPageSender() {
-        return _hasPageSender;
-    }
-
-    public boolean hasPageReceiver() {
-        return _hasPageReceiver;
-    }
-
-    public boolean hasPageProxy() {
-        return hasPageSender() || hasPageReceiver();
-    }
-
-    public WebDApi api() {
-        return _api;
-    }
-
-    protected void load() {
-        if (hasPageOrigin()) {
-            _pageList.add(createRedirectPage());
-            _pageList.add(createIndexPage());
-            _pageList.add(createLoginPage());
-            _pageList.add(createLogoutPage());
-            _pageList.add(createPasswordPage());
-            _pageList.add(createRawFilePage());
-            _pageList.add(createFileSystemPage());
-            _pageList.add(createPublicIPPage());
-            _pageList.add(createApiDocsPage());
-            _pageList.add(createErrorPage());
-            _pageList.add(createNotFoundPage());
-            _pageList.add(createHomePage());
-        } else {
-            if (hasPageSender()) {
-                _pageList.add(createSenderProxyPage());
-            } else if (hasPageReceiver()) {
-                _pageList.add(createReceiverProxyPage());
-            }
-        }
-    }
-
-    protected Page createPasswordPage() { return new DefaultPasswordPage(api()); }
-
-    protected Page createLogoutPage() { return new DefaultLogoutPage(api()); }
-
-    protected Page createLoginPage() { return new DefaultLoginPage(api()); }
-
-    protected Page createReceiverProxyPage() {
-        return new DefaultReceiverProxyPage(api());
-    }
-
-    protected Page createSenderProxyPage() {
-        return new DefaultSenderProxyPage(api());
-    }
-
-    protected Page createRedirectPage() {
-        return new DefaultRedirectPage(api());
-    }
-
-    protected Page createFileSystemPage() {
-        return new DefaultFileSystemPage(api());
-    }
-
-    protected Page createPublicIPPage() {
-        return new PublicIPPage(api());
-    }
-
-    protected Page createApiDocsPage() {
-        return new DefaultApiDocsPage(api());
-    }
-
-    protected Page createErrorPage() {
-        return new DefaultErrorPage(api());
-    }
-
-    protected Page createNotFoundPage() {
-        return new DefaultNotFoundPage(api());
-    }
-
-    protected Page createHomePage() {
-        return new DefaultHomePage(api());
-    }
-
-    protected Page createIndexPage() {
-        return new DefaultIndexPage(api());
-    }
-
-    protected Page createRawFilePage() {
-        return new DefaultRawFilePage(api());
-    }
-
-    public List<String> pages() {
+    public final List<String> pages() {
         List<String> tag = new ArrayList<>();
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
@@ -163,7 +58,7 @@ public class PageFactory {
         return tag;
     }
 
-    public Page get(String code) {
+    public final Page get(String code) {
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
             if (page.code().equalsIgnoreCase(code)) {
@@ -174,13 +69,6 @@ public class PageFactory {
     }
 
     public PageFactory add(Page p) {
-        if (!hasPageOrigin()) {
-            if (!hasPageProxy()) {
-                return api().originPageFactory().add(p);
-            }
-            return this;
-        }
-
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
             if (page.code().equalsIgnoreCase(p.code())) {
@@ -192,38 +80,6 @@ public class PageFactory {
     }
 
     public PageResponse run(final jsb.webd.SSession session) {
-        VHost vh = api().config().vhostList().find(session.host());
-        if (vh != null) {
-            if (!hasPageOrigin()) {
-                if (!hasPageProxy()) {
-                    if (vh.hasPageSender()) {
-                        return api().senderPageFactory().run(session);
-                    }
-                    if (vh.hasPageReceiver()) {
-                        return api().receiverPageFactory().run(session);
-                    }
-                    return null;
-                }
-            }
-            if (vh.passwordProtected()) {
-                if (!api().sessionData().getOnline(session)) {
-                    String path = session.uri();
-                    int idx = path.lastIndexOf("?");
-                    if (idx >= 0) {
-                        path = path.substring(0, idx);
-                    }
-                    if (!"/proxy.yo".equalsIgnoreCase(path) && !"/login.yo".equalsIgnoreCase(path) && !"/logout.yo".equalsIgnoreCase(path) && !"/password.yo".equalsIgnoreCase(path)) {
-                        PageResponse prs = new PageResponse("LoginRequired", "Login Required", "");
-                        try {
-                            prs.get("_redirect").value("/login.yo?returnUrl=" + URLEncoder.encode(session.uri(), "UTF-8"));
-                        } catch (Throwable e) {
-                            prs.get("_redirect").value("/login.yo");
-                        }
-                        return prs;
-                    }
-                }
-            }
-        }
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
             if (page.accepted(session)) {
@@ -240,38 +96,6 @@ public class PageFactory {
     }
 
     public PageResponse run(final String code, final jsb.webd.SSession session) {
-        VHost vh = api().config().vhostList().find(session.host());
-        if (vh != null) {
-            if (!hasPageOrigin()) {
-                if (!hasPageProxy()) {
-                    if (vh.hasPageSender()) {
-                        return api().senderPageFactory().run(code, session);
-                    }
-                    if (vh.hasPageReceiver()) {
-                        return api().receiverPageFactory().run(code, session);
-                    }
-                    return null;
-                }
-            }
-            if (vh.passwordProtected()) {
-                if (!api().sessionData().getOnline(session)) {
-                    String path = session.uri();
-                    int idx = path.lastIndexOf("?");
-                    if (idx >= 0) {
-                        path = path.substring(0, idx);
-                    }
-                    if (!"/proxy.yo".equalsIgnoreCase(path) && !"/login.yo".equalsIgnoreCase(path) && !"/logout.yo".equalsIgnoreCase(path) && !"/password.yo".equalsIgnoreCase(path)) {
-                        PageResponse prs = new PageResponse("LoginRequired", "Login Required", "");
-                        try {
-                            prs.get("_redirect").value("/login.yo?returnUrl=" + URLEncoder.encode(session.uri(), "UTF-8"));
-                        } catch (Throwable e) {
-                            prs.get("_redirect").value("/login.yo");
-                        }
-                        return prs;
-                    }
-                }
-            }
-        }
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
             if (page.accepted(code)) {
@@ -288,39 +112,6 @@ public class PageFactory {
     }
 
     public PageResponse run(final String code, PageRequest pr) {
-        SSession session = (SSession)pr.get("_session").value();
-        VHost vh = api().config().vhostList().find(session.host());
-        if (vh != null) {
-            if (!hasPageOrigin()) {
-                if (!hasPageProxy()) {
-                    if (vh.hasPageSender()) {
-                        return api().senderPageFactory().run(code, pr);
-                    }
-                    if (vh.hasPageReceiver()) {
-                        return api().receiverPageFactory().run(code, pr);
-                    }
-                    return null;
-                }
-            }
-            if (vh.passwordProtected()) {
-                if (!api().sessionData().getOnline(session)) {
-                    String path = session.uri();
-                    int idx = path.lastIndexOf("?");
-                    if (idx >= 0) {
-                        path = path.substring(0, idx);
-                    }
-                    if (!"/proxy.yo".equalsIgnoreCase(path) && !"/login.yo".equalsIgnoreCase(path) && !"/logout.yo".equalsIgnoreCase(path) && !"/password.yo".equalsIgnoreCase(path)) {
-                        PageResponse prs = new PageResponse("LoginRequired", "Login Required", "");
-                        try {
-                            prs.get("_redirect").value("/login.yo?returnUrl=" + URLEncoder.encode(session.uri(), "UTF-8"));
-                        } catch (Throwable e) {
-                            prs.get("_redirect").value("/login.yo");
-                        }
-                        return prs;
-                    }
-                }
-            }
-        }
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
             if (page.accepted(code)) {
@@ -330,7 +121,7 @@ public class PageFactory {
         return null;
     }
 
-    public PageRequest sessionToRequest(final String code, final jsb.webd.SSession session) {
+    public final PageRequest sessionToRequest(final String code, final jsb.webd.SSession session) {
         for (int i = 0; i < _pageList.size(); i++) {
             Page page = _pageList.get(i);
             if (page.accepted(code)) {

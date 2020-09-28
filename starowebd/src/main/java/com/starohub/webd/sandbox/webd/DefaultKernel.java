@@ -34,12 +34,12 @@
 
 package com.starohub.webd.sandbox.webd;
 
+import jsb.webd.SBluePrint;
 import jsb.webd.SPackage;
 import jsx.webd.Kernel;
-import jsx.webd.WebDApi;
 
 public class DefaultKernel extends jsb.webd.SKernel {
-    public DefaultKernel(SPackage pkg, WebDApi api, Kernel kernel) {
-        super(pkg, api, kernel);
+    public DefaultKernel(SPackage pkg, SBluePrint blueprint, Kernel kernel) {
+        super(pkg, blueprint, kernel);
     }
 }

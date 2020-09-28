@@ -34,44 +34,47 @@
 
 package com.starohub.webd.sandbox.webd;
 
-import jsb.webd.SArtWork;
-import jsb.webd.SDataSet;
-import jsb.webd.SKernel;
-import jsb.webd.SPackage;
+import jsb.webd.*;
 import jsx.webd.BluePrint;
+import jsx.webd.Redirect;
 import jsx.webd.WebDApi;
 
 import java.util.Map;
 
 public class DefaultBluePrint extends jsb.webd.SBluePrint {
-    public DefaultBluePrint(SPackage pkg, WebDApi api, BluePrint blueprint) {
-        super(pkg, api, blueprint);
+    public DefaultBluePrint(SPackage pkg, BluePrint blueprint) {
+        super(pkg, blueprint);
+    }
+
+    @Override
+    protected SRedirect createRedirect(SPackage pkg, Redirect redirect) {
+        return new SRedirect(pkg, redirect);
     }
 
     @Override
     protected void createArtWorkMap(Map<String, SArtWork> artworkMap) {
-        if (api().blueprint() == null) return;
-        java.util.List<String> codes = api().blueprint().artWorkList();
+        if (blueprint() == null) return;
+        java.util.List<String> codes = blueprint().artworkList();
         for (String code : codes) {
-            artworkMap.put(code, api().blueprint().createSArtWork(pkg(), api(), api().blueprint().artWork(code)));
+            artworkMap.put(code, blueprint().createSArtWork(pkg(), this, blueprint().artwork(code)));
         }
     }
 
     @Override
     protected void createDataSetMap(Map<String, SDataSet> datasetMap) {
-        if (api().blueprint() == null) return;
-        java.util.List<String> codes = api().blueprint().dataSetList();
+        if (blueprint() == null) return;
+        java.util.List<String> codes = blueprint().dataSetList();
         for (String code : codes) {
-            datasetMap.put(code, api().blueprint().createSDataSet(pkg(), api(), api().blueprint().dataSet(code)));
+            datasetMap.put(code, blueprint().createSDataSet(pkg(), this, blueprint().dataset(code)));
         }
     }
 
     @Override
     protected void createKernelMap(Map<String, SKernel> kernelMap) {
-        if (api().blueprint() == null) return;
-        java.util.List<String> codes = api().blueprint().kernelList();
+        if (blueprint() == null) return;
+        java.util.List<String> codes = blueprint().kernelList();
         for (String code : codes) {
-            kernelMap.put(code, api().blueprint().createSKernel(pkg(), api(), api().blueprint().kernel(code)));
+            kernelMap.put(code, blueprint().createSKernel(pkg(), this, blueprint().kernel(code)));
         }
     }
 }

@@ -54,20 +54,20 @@ public class FileItem {
     private String _mime;
     private List<FileItem> _children = null;
 
-    public String name() { return _name; }
-    public FileItem name(String val) { _name = val; return this; }
+    public final String name() { return _name; }
+    public final FileItem name(String val) { _name = val; return this; }
 
-    public String ext() { return _ext; }
-    public FileItem ext(String val) { _ext = val; return this; }
+    public final String ext() { return _ext; }
+    public final FileItem ext(String val) { _ext = val; return this; }
 
-    public String kind() { return _kind; }
-    public FileItem kind(String val) { _kind = val; return this; }
+    public final String kind() { return _kind; }
+    public final FileItem kind(String val) { _kind = val; return this; }
 
-    public String parent() { return _parent; }
-    public FileItem parent(String val) { _parent = val; return this; }
+    public final String parent() { return _parent; }
+    public final FileItem parent(String val) { _parent = val; return this; }
 
-    public String mime() { return _mime; }
-    //public FileItem mime(String val) { _mime = val; return this; }
+    public final String mime() { return _mime; }
+    //public final FileItem mime(String val) { _mime = val; return this; }
 
     public FileItem(SBObject sbobject, String path) {
         _sbobject = sbobject;
@@ -79,7 +79,7 @@ public class FileItem {
         filepath(new File(parent, path).getAbsolutePath());
     }
 
-    public Map map() {
+    public final Map map() {
         Map tag = new HashMap();
         tag.put("name", _name);
         tag.put("ext", _ext);
@@ -89,7 +89,7 @@ public class FileItem {
         return tag;
     }
 
-    public FileItem map(Map val) {
+    public final FileItem map(Map val) {
         if (val.containsKey("name")) {
             _name = val.get("name").toString();
         }
@@ -108,7 +108,7 @@ public class FileItem {
         return this;
     }
 
-    public String filepath() {
+    public final String filepath() {
         try {
             String path = _parent;
             if (!path.startsWith("/")) {
@@ -125,7 +125,7 @@ public class FileItem {
         }
     }
 
-    public FileItem mimeFromExt() {
+    public final FileItem mimeFromExt() {
         _mime = "application/download";
         if (_ext.equalsIgnoreCase("jpg")) {
             _mime = "image/jpeg";
@@ -172,7 +172,7 @@ public class FileItem {
         return tag;
     }
 
-    public FileItem filepath(String path) {
+    public final FileItem filepath(String path) {
         try {
             SFile file = _sbobject.sandbox().machine().mnt().newFile(path);
             _name = file.name();
@@ -196,7 +196,7 @@ public class FileItem {
         return this;
     }
 
-    public List<FileItem> children() {
+    public final List<FileItem> children() {
         if (_children == null) {
             _children = new ArrayList<FileItem>();
             try {

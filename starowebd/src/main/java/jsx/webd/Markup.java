@@ -57,9 +57,9 @@ public class Markup {
         return _api;
     }
 
-    public Markup renderFile(PageResponse ps, String filepath, String mime) throws SException {
+    public final Markup renderFile(SSession session, PageResponse ps, String filepath, String mime) throws SException {
         try {
-            SFile file = api().sbObject().sandbox().machine().mnt().newFile(filepath);
+            SFile file = api().sbObject(session).sandbox().machine().mnt().newFile(filepath);
             SInputStream fis = file.inputStream();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -74,14 +74,14 @@ public class Markup {
             ps.get("_return_bytes").value(base64);
             ps.get("_return_mime").value(mime);
         } catch (Throwable e) {
-            throw api().sbObject().sandbox().machine().io().newException(e);
+            throw api().sbObject(session).sandbox().machine().io().newException(e);
         }
         return this;
     }
 
-    public Markup renderJSB(SSession session, PageResponse ps, String scriptName, String uri, String filepath) throws SException {
+    public final Markup renderJSB(SSession session, PageResponse ps, String scriptName, String uri, String filepath) throws SException {
         try {
-            SFile file = api().sbObject().sandbox().machine().mnt().newFile(filepath);
+            SFile file = api().sbObject(session).sandbox().machine().mnt().newFile(filepath);
             SInputStream fis = file.inputStream();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -92,7 +92,14 @@ public class Markup {
             }
             fis.close();
             String js = new String(baos.toByteArray(), "UTF-8");
-            SBObject sbo = new DefaultSBObject(js, 60, api(), api().more());
+            Map more = new HashMap();
+            for (Object key : api().more().keySet()) {
+                more.put(key, api().more().get(key));
+            }
+            more.put("session", session);
+            more.put("api", api());
+            BluePrint blueprint = api().blueprint(session);
+            SBObject sbo = new DefaultSBObject(js, blueprint.host().pageTimeout(), api(), session, more);
             sbo.set("_script", scriptName);
             Map iMap = new HashMap();
             if (uri.length() == 0) {
@@ -107,15 +114,15 @@ public class Markup {
                 ps.fromMap(oMap);
             }
         } catch (Throwable e) {
-            throw api().sbObject().sandbox().machine().io().newException(e);
+            throw api().sbObject(session).sandbox().machine().io().newException(e);
         }
         return this;
     }
 
-    public Markup renderJSM(SSession session, Page page, PageResponse ps, String uri, String filepath) throws SException {
+    public final Markup renderJSM(SSession session, Page page, PageResponse ps, String uri, String filepath) throws SException {
         try {
             Map args = new HashMap();
-            SFile file = api().sbObject().sandbox().machine().mnt().newFile(filepath);
+            SFile file = api().sbObject(session).sandbox().machine().mnt().newFile(filepath);
             String html = new String(file.readFile(), "UTF-8");
 
             Map pm = new HashMap();
@@ -131,10 +138,7 @@ public class Markup {
                 if (idx2 >= 0) {
                     String dataFilePath = html.substring(idx + find.length(), idx2).trim();
                     dataFilePath = page.mergeHtml(dataFilePath, pm).replaceAll("\\{", "").replaceAll("}", "");
-
-                    System.out.println("data: " + dataFilePath);
-
-                    SFile dataFile = api().sbObject().sandbox().machine().mnt().newFile(dataFilePath);
+                    SFile dataFile = api().sbObject(session).sandbox().machine().mnt().newFile(dataFilePath);
                     if (dataFile.exists()) {
                         String jsonStr = new String(dataFile.readFile(), "UTF-8");
                         args = Tool.jsonToMap(jsonStr);
@@ -152,11 +156,9 @@ public class Markup {
                         String dsCode = html.substring(idx + find.length(), idx2).trim();
                         dsCode = page.mergeHtml(dsCode, pm).replaceAll("\\{", "").replaceAll("}", "");
 
-                        System.out.println("data: " + dsCode);
-
-                        if (api().blueprint() != null) {
-                            if (api().blueprint().dataSet(dsCode) != null) {
-                                String jsonStr = api().blueprint().dataSet(dsCode).jsonData(uri);
+                        if (api().blueprint(session) != null) {
+                            if (api().blueprint(session).dataset(dsCode) != null) {
+                                String jsonStr = api().blueprint(session).dataset(dsCode).jsonData(uri);
                                 args = Tool.jsonToMap(jsonStr);
                                 for (Object key : pm.keySet()) {
                                     args.put(key, pm.get(key));
@@ -171,7 +173,7 @@ public class Markup {
             ps.get("_return_bytes").value(base64);
             ps.get("_return_mime").value("text/html");
         } catch (Throwable e) {
-            throw api().sbObject().sandbox().machine().io().newException(e);
+            throw api().sbObject(session).sandbox().machine().io().newException(e);
         }
         return this;
     }

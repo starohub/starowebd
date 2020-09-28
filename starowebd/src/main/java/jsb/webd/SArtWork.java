@@ -38,43 +38,56 @@ import jsb.SCustomVisiblePatternStore;
 import jsb.SDefaultVisiblePatternStore;
 import jsb.io.SException;
 import jsx.webd.ArtWork;
-import jsx.webd.WebDApi;
-
+import jsx.webd.PageResponse;
 import java.util.Map;
 
 public class SArtWork {
     private jsb.webd.SPackage _pkg;
-    private WebDApi _api;
     private ArtWork _artwork;
+    private SBluePrint _blueprint;
     private SDefaultVisiblePatternStore _defaultVisibleStore;
     private SCustomVisiblePatternStore _customVisibleStore;
 
-    public SArtWork(jsb.webd.SPackage pkg, WebDApi api, ArtWork artwork) {
+    public SArtWork(jsb.webd.SPackage pkg, SBluePrint blueprint, ArtWork artwork) {
         _pkg = pkg;
-        _api = api;
         _artwork = artwork;
+        _blueprint = blueprint;
         _defaultVisibleStore = new SDefaultVisiblePatternStore();
         _customVisibleStore = new SCustomVisiblePatternStore();
         setupVisible();
     }
 
-    protected ArtWork artwork() {
+    protected final ArtWork artwork() {
         return _artwork;
     }
 
-    public jsb.webd.SPackage pkg() {
+    public final jsb.webd.SPackage pkg() {
         return _pkg;
     }
 
-    protected WebDApi api() {
-        return _api;
+    protected final SBluePrint blueprint() {
+        return _blueprint;
     }
 
-    protected SBluePrint blueprint() {
-        return pkg().blueprint();
+    public final SArtWork theme(PageResponse output, String code, String path, String data, Map args) throws SException {
+        try {
+            artwork().theme(output, code, path, data, args);
+        } catch (Throwable e) {
+            throw pkg().machine().io().newException(e);
+        }
+        return this;
     }
 
-    public String mergeHtml(String code, String path, String data, Map args) throws SException {
+    public final SArtWork theme(Map outputMap, String code, String path, String data, Map args) throws SException {
+        try {
+            artwork().theme(outputMap, code, path, data, args);
+        } catch (Throwable e) {
+            throw pkg().machine().io().newException(e);
+        }
+        return this;
+    }
+
+    public final String mergeHtml(String code, String path, String data, Map args) throws SException {
         try {
             return artwork().mergeHtml(code, path, data, args);
         } catch (Throwable e) {
@@ -82,7 +95,7 @@ public class SArtWork {
         }
     }
 
-    public SArtWork mergeFile(String code, String path, String data, Map args, String tagFile) throws SException {
+    public final SArtWork mergeFile(String code, String path, String data, Map args, String tagFile) throws SException {
         try {
             artwork().mergeFile(code, path, data, args, tagFile);
             return this;
@@ -129,7 +142,7 @@ public class SArtWork {
         return false;
     }
 
-    public boolean invisibleToScripts(String className) {
+    public final boolean invisibleToScripts(String className) {
         if (_defaultVisibleStore.invisibleToScripts(className)) return true;
         if (_customVisibleStore.invisibleToScripts(className)) return true;
         return false;

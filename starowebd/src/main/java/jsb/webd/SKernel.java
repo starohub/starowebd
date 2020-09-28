@@ -7,34 +7,30 @@ import jsx.webd.WebDApi;
 
 public class SKernel {
     private jsb.webd.SPackage _pkg;
-    private WebDApi _api;
+    private SBluePrint _blueprint;
     private Kernel _kernel;
     private SDefaultVisiblePatternStore _defaultVisibleStore;
     private SCustomVisiblePatternStore _customVisibleStore;
 
-    public SKernel(jsb.webd.SPackage pkg, WebDApi api, Kernel kernel) {
+    public SKernel(jsb.webd.SPackage pkg, SBluePrint blueprint, Kernel kernel) {
         _pkg = pkg;
-        _api = api;
         _kernel = kernel;
+        _blueprint = blueprint;
         _defaultVisibleStore = new SDefaultVisiblePatternStore();
         _customVisibleStore = new SCustomVisiblePatternStore();
         setupVisible();
     }
 
-    protected Kernel kernel() {
+    protected final Kernel kernel() {
         return _kernel;
     }
 
-    public jsb.webd.SPackage pkg() {
+    public final jsb.webd.SPackage pkg() {
         return _pkg;
     }
 
-    protected WebDApi api() {
-        return _api;
-    }
-
-    protected SBluePrint blueprint() {
-        return pkg().blueprint();
+    protected final SBluePrint blueprint() {
+        return _blueprint;
     }
 
     protected final SKernel defaultVisible(String pattern, boolean startsWith) {
@@ -75,7 +71,7 @@ public class SKernel {
         return false;
     }
 
-    public boolean invisibleToScripts(String className) {
+    public final boolean invisibleToScripts(String className) {
         if (_defaultVisibleStore.invisibleToScripts(className)) return true;
         if (_customVisibleStore.invisibleToScripts(className)) return true;
         return false;

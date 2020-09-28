@@ -34,19 +34,12 @@
 
 package jsb.webd;
 
-import com.starohub.jsb.SBObject;
 import com.starohub.webd.Tool;
-import com.starohub.webd.sandbox.DefaultMachine;
-import com.starohub.webd.sandbox.DefaultSBObject;
-import com.starohub.webd.sandbox.DefaultSandbox;
 import jsb.SFile;
 import jsb.SMachine;
 import jsb.io.SException;
 import jsb.io.SInputStream;
-import jsx.webd.BluePrint;
-import jsx.webd.FileItem;
-import jsx.webd.Redirect;
-import jsx.webd.WebDApi;
+import jsx.webd.*;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
@@ -54,45 +47,52 @@ import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class SPackage extends jsb.SPackage {
-    private SBluePrint _blueprint;
-    private SRedirect _redirect;
+    private Map<String, SBluePrint> _blueprintMap = new HashMap<>();
     private WebDApi _api;
 
     public SPackage(WebDApi api, SMachine machine, Map more) {
         super(machine, more);
         _api = api;
-        _blueprint = createBluePrint(this, api, api.blueprint());
-        _redirect = createRedirect(this, api, api.redirect());
     }
 
-    protected WebDApi api() {
+    protected final WebDApi api() {
         return _api;
     }
 
-    public SRedirect redirect() { return _redirect; }
-
-    public SBluePrint blueprint() {
-        return _blueprint;
+    public final List<SBluePrint> blueprintList() {
+        List<SBluePrint> tag = new ArrayList<>();
+        for (String host : _blueprintMap.keySet()) {
+            tag.add(_blueprintMap.get(host));
+        }
+        return tag;
     }
 
-    protected abstract SBluePrint createBluePrint(jsb.webd.SPackage pkg, WebDApi api, BluePrint blueprint);
-    protected abstract SRedirect createRedirect(jsb.webd.SPackage pkg, WebDApi api, Redirect redirect);
-
-    protected SBObject sbObject() {
-        return api().sbObject();
+    public final SBluePrint blueprint(SSession session) {
+        VHost vh = api().config().vhostList().find(session.host());
+        if (session.proxyHost() != null) {
+            vh = api().config().vhostList().find(session.proxyHost());
+        }
+        if (!_blueprintMap.containsKey(vh.host())) {
+            _blueprintMap.put(vh.host(), createBluePrint(this, api().blueprint(session)));
+        }
+        return _blueprintMap.get(vh.host());
     }
 
-    public void theme(Map outputMap, String uri, Map args) throws Exception {
-        outputMap.put("_return_html", merge(template(uri), args));
+    protected abstract SBluePrint createBluePrint(jsb.webd.SPackage pkg, BluePrint blueprint);
+
+    public final SPackage theme(SSession session, Map outputMap, String uri, Map args) throws Exception {
+        outputMap.put("_return_html", merge(template(session, uri), args));
+        return this;
     }
 
-    public String template(String uri) throws Exception {
+    public final String template(SSession session, String uri) throws Exception {
         String tag = "";
-        FileItem item = new FileItem(sbObject(), uri);
+        FileItem item = new FileItem(api().blueprint(session).sbObject(), uri);
         if (item.kind().equalsIgnoreCase("file")) {
             SFile file = machine().mnt().newFile(uri);
             try {
@@ -114,7 +114,7 @@ public abstract class SPackage extends jsb.SPackage {
         return tag;
     }
 
-    public String merge(String template, Map args) throws Exception {
+    public final String merge(String template, Map args) throws Exception {
         VelocityEngine engine = new VelocityEngine();
         engine.init();
         VelocityContext ctx = new VelocityContext();
@@ -126,20 +126,19 @@ public abstract class SPackage extends jsb.SPackage {
         return writer.toString();
     }
 
-    public Map<String, String> getQueryMap(final jsb.webd.SSession session) throws Exception {
+    public final Map<String, String> getQueryMap(final jsb.webd.SSession session) throws Exception {
         return session.params();
     }
 
-    public Map<String, String> postQueryMap(final jsb.webd.SSession session) throws Exception {
-        session.files();
+    public final Map<String, String> postQueryMap(final jsb.webd.SSession session) throws Exception {
         return session.params();
     }
 
-    public  Map postJsonMap(final jsb.webd.SSession session) throws Exception {
+    public final Map postJsonMap(final jsb.webd.SSession session) throws Exception {
         return Tool.jsonToMap(session.files().get("postData") + "");
     }
 
-    public String stringParam(Map<String, String> params, String key, String defaultValue) {
+    public final String stringParam(Map<String, String> params, String key, String defaultValue) {
         String target = defaultValue;
         if (params.containsKey(key)) {
             target = params.get(key);
@@ -147,7 +146,7 @@ public abstract class SPackage extends jsb.SPackage {
         return target;
     }
 
-    public List<String> stringListParam(Map<String, String> params, String key) {
+    public final List<String> stringListParam(Map<String, String> params, String key) {
         if (params.containsKey(key)) {
             String[] paramArray = params.get(key).split("~");
             List<String> target = new ArrayList<>();
@@ -159,7 +158,7 @@ public abstract class SPackage extends jsb.SPackage {
         return new ArrayList<>();
     }
 
-    public int intParam(Map<String, String> params, String key, int defaultValue) {
+    public final int intParam(Map<String, String> params, String key, int defaultValue) {
         int target = defaultValue;
         if (params.containsKey(key)) {
             target = Integer.parseInt(params.get(key));
@@ -167,7 +166,7 @@ public abstract class SPackage extends jsb.SPackage {
         return target;
     }
 
-    public long longParam(Map<String, String> params, String key, long defaultValue) {
+    public final long longParam(Map<String, String> params, String key, long defaultValue) {
         long target = defaultValue;
         if (params.containsKey(key)) {
             target = Long.parseLong(params.get(key));

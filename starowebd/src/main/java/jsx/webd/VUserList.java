@@ -39,24 +39,86 @@ import com.starohub.webd.Tool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class VUserList {
+public final class VUserList {
     private List<VUser> _users = new ArrayList<>();
-    private String _host;
+    private VHost _host;
+    private boolean _locked = false;
+    private String _masterToken = UUID.randomUUID().toString().replaceAll("-", "");
 
-    public VUserList(String host) {
+    public final boolean locked() {
+        return _locked;
+    }
+
+    public final VUserList lock(String masterToken) {
+        if (_locked) return this;
+        _locked = true;
+        _masterToken = masterToken;
+        return this;
+    }
+
+    public final VUserList save(VUser u, String masterToken) {
+        if (!host().validToken(masterToken)) return this;
+        if (u == null) return this;
+        if (!u.locked()) return this;
+        if (!u.validToken(masterToken)) return this;
+        for (int i = 0; i < _users.size(); i++) {
+            if (_users.get(i).username().equalsIgnoreCase(u.username())) {
+                if (!_users.get(i).locked()) return this;
+                if (!_users.get(i).validToken(masterToken)) return this;
+                u.saveToFS(masterToken);
+                _users.set(i, u);
+            }
+        }
+        return this;
+    }
+
+    public final VUserList edit(VUser u, String masterToken) {
+        if (!host().validToken(masterToken)) return this;
+        if (u == null) return this;
+        if (u.locked()) return this;
+        for (int i = 0; i < _users.size(); i++) {
+            if (_users.get(i).username().equalsIgnoreCase(u.username())) {
+                if (u.locked()) return this;
+                u.lock(masterToken);
+                _users.set(i, u);
+            }
+        }
+        return this;
+    }
+
+    public VUserList(VHost host) {
         _host = host;
     }
 
-    public String host() {
+    public final VHost host() {
         return _host;
     }
 
-    public List<VUser> users() {
-        return _users;
+    public final int size() {
+        return _users.size();
     }
 
-    public VUser find(String username) {
+    public final VUser get(int idx) {
+        return _users.get(idx);
+    }
+
+    public final VUserList add(VUser user) {
+        if (locked()) return this;
+        _users.add(user);
+        return this;
+    }
+
+    public final VUserList add(VUser user, String masterToken) {
+        if (!host().validToken(masterToken)) return this;
+        if (user.locked()) return this;
+        user.lock(masterToken);
+        _users.add(user);
+        return this;
+    }
+
+    public final VUser find(String username) {
         for (int i = 0; i < _users.size(); i++) {
             if (username.equalsIgnoreCase(_users.get(i).username())) {
                 return _users.get(i);
@@ -65,7 +127,7 @@ public class VUserList {
         return null;
     }
 
-    public List toList() {
+    public final List toList() {
         List tag = new ArrayList();
         for (VUser h : _users) {
             tag.add(h.toMap());
@@ -73,12 +135,13 @@ public class VUserList {
         return tag;
     }
 
-    public VUserList fromList(List srcList) {
+    public final VUserList fromList(List srcList) {
+        if (locked()) return this;
         _users = new ArrayList<>();
         for (int i = 0; i < srcList.size(); i++) {
             Map srcMap = Tool.listItemToMap(srcList, i);
             VUser h = new VUser(host());
-            h.fromMap(null, srcMap);
+            h.fromMap(srcMap);
             _users.add(h);
         }
         return this;

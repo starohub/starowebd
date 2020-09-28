@@ -41,59 +41,85 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class VUser {
     private String _username;
     private String _password;
     private boolean _encrypted;
-    private String _host;
+    private VHost _host;
     private Map _more = new HashMap();
+    private boolean _locked = false;
+    private String _masterToken = UUID.randomUUID().toString().replaceAll("-", "");
+    private boolean _loaded = false;
 
-    public Map more() {
+    public final boolean validToken(String masterToken) {
+        if (host() == null) return false;
+        if (!host().validToken(masterToken)) return false;
+        if (!_masterToken.equalsIgnoreCase(masterToken)) return false;
+        return true;
+    }
+
+    public final boolean locked() {
+        return _locked;
+    }
+
+    public final VUser lock(String masterToken) {
+        if (_locked) return this;
+        _locked = true;
+        _masterToken = masterToken;
+        return this;
+    }
+
+    public final Map more() {
         return _more;
     }
 
-    public VUser more(Map src) {
+    public final VUser more(Map src) {
+        if (locked()) return this;
         _more = src;
         return this;
     }
 
-    public VUser(String host) {
+    public VUser(VHost host) {
         _host = host;
     }
 
-    public String host() {
+    public final VHost host() {
         return _host;
     }
 
-    public String username() {
+    public final String username() {
         return _username;
     }
 
-    public VUser username(String src) {
+    public final VUser username(String src) {
+        if (locked()) return this;
         _username = src;
         return this;
     }
 
-    public String password() {
+    public final String password() {
         return _password;
     }
 
-    public VUser password(String src) {
+    public final VUser password(String src) {
+        if (locked()) return this;
         _password = src;
         return this;
     }
 
-    public boolean encrypted() {
+    public final boolean encrypted() {
         return _encrypted;
     }
 
-    public VUser encrypted(boolean src) {
+    public final VUser encrypted(boolean src) {
+        if (locked()) return this;
         _encrypted = src;
         return this;
     }
 
-    public String md5(String src) {
+    public final String md5(String src) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(src.getBytes());
@@ -102,22 +128,23 @@ public class VUser {
                     .printHexBinary(digest).toUpperCase();
             return myHash;
         } catch (Throwable e) {
+            host().blueprint().platform().log(e);
             return src;
         }
     }
 
-    public boolean matched(String password) {
+    public final boolean matched(String password) {
         if (encrypted()) {
             String md5 = md5(password);
             return md5.equals(password());
         } else {
             String md5 = md5(password());
-            System.out.println("VUser is not encrypted, please encrypt it: {\"username\": " + username() + ", \"encrypted\": true, \"password\": " + md5 + "}");
+            host().blueprint().platform().log("VUser is not encrypted, please encrypt it: {\"username\": " + username() + ", \"encrypted\": true, \"password\": " + md5 + "}");
             return password.equals(password());
         }
     }
 
-    public Map toMap() {
+    public final Map toMap() {
         Map tag = new HashMap();
         tag.put("username", username());
         tag.put("password", password());
@@ -126,65 +153,65 @@ public class VUser {
         return tag;
     }
 
-    public VUser saveToFS(WebDApi api) {
+    public final VUser saveToFS(String masterToken) {
         try {
-            String filename = "/etc/" + host() + "/" + username() + ".json";
-            api.sbObject().sandbox().machine().mnt().newFile("/etc/" + host()).mkdirs();
-            SFile sfile = api.sbObject().sandbox().machine().mnt().newFile(filename);
+            if (!validToken(masterToken)) return this;
+            String filename = "/etc/" + host().host() + "/" + username() + ".json";
+            host().blueprint().sbObject().sandbox().machine().mnt().newFile("/etc/" + host().host()).mkdirs();
+            SFile sfile = host().blueprint().sbObject().sandbox().machine().mnt().newFile(filename);
             sfile.writeFile(Tool.toJson(toMap()).getBytes("UTF-8"));
         } catch (Throwable e) {}
         return this;
     }
-    public VUser fromMap(WebDApi api, Map srcMap) {
-        if (api == null) {
-            if (srcMap.containsKey("username")) {
-                _username = srcMap.get("username") + "";
-            }
-            if (srcMap.containsKey("password")) {
-                _password = srcMap.get("password") + "";
-            }
-            if (srcMap.containsKey("encrypted")) {
-                _encrypted = "true".equalsIgnoreCase(srcMap.get("encrypted") + "");
-            }
-            if (srcMap.containsKey("more")) {
-                _more = Tool.mapItemToMap(srcMap, "more");
-            }
-        } else {
-            String filename = "/etc/" + host() + "/" + srcMap.get("username") + ".json";
-            api.sbObject().sandbox().machine().mnt().newFile("/etc/" + host()).mkdirs();
-            SFile sfile = api.sbObject().sandbox().machine().mnt().newFile(filename);
-            if (sfile.exists()) {
-                try {
-                    String jsonStr = new String(sfile.readFile(), "UTF-8");
-                    Map srcMap2 = Tool.jsonToMap(jsonStr);
-                    if (srcMap2.containsKey("username")) {
-                        _username = srcMap2.get("username") + "";
-                    }
-                    if (srcMap2.containsKey("password")) {
-                        _password = srcMap2.get("password") + "";
-                    }
-                    if (srcMap2.containsKey("encrypted")) {
-                        _encrypted = "true".equalsIgnoreCase(srcMap2.get("encrypted") + "");
-                    }
-                    if (srcMap2.containsKey("more")) {
-                        _more = Tool.mapItemToMap(srcMap2, "more");
-                    }
-                } catch (Throwable e) {
+
+    public final VUser clone() {
+        Map um = toMap();
+        VUser u = new VUser(host());
+        u.fromMap(um);
+        return u;
+    }
+
+    public final VUser load() {
+        if (_loaded) return this;
+        _loaded = true;
+        String filename = "/etc/" + host().host() + "/" + username() + ".json";
+        host().blueprint().sbObject().sandbox().machine().mnt().newFile("/etc/" + host().host()).mkdirs();
+        SFile sfile = host().blueprint().sbObject().sandbox().machine().mnt().newFile(filename);
+        if (sfile.exists()) {
+            try {
+                String jsonStr = new String(sfile.readFile(), "UTF-8");
+                Map srcMap2 = Tool.jsonToMap(jsonStr);
+                if (srcMap2.containsKey("username")) {
+                    _username = srcMap2.get("username") + "";
                 }
-            } else {
-                if (srcMap.containsKey("username")) {
-                    _username = srcMap.get("username") + "";
+                if (srcMap2.containsKey("password")) {
+                    _password = srcMap2.get("password") + "";
                 }
-                if (srcMap.containsKey("password")) {
-                    _password = srcMap.get("password") + "";
+                if (srcMap2.containsKey("encrypted")) {
+                    _encrypted = "true".equalsIgnoreCase(srcMap2.get("encrypted") + "");
                 }
-                if (srcMap.containsKey("encrypted")) {
-                    _encrypted = "true".equalsIgnoreCase(srcMap.get("encrypted") + "");
+                if (srcMap2.containsKey("more")) {
+                    _more = Tool.mapItemToMap(srcMap2, "more");
                 }
-                if (srcMap.containsKey("more")) {
-                    _more = Tool.mapItemToMap(srcMap, "more");
-                }
+            } catch (Throwable e) {
             }
+        }
+        return this;
+    }
+
+    public final VUser fromMap(Map srcMap) {
+        if (locked()) return this;
+        if (srcMap.containsKey("username")) {
+            _username = srcMap.get("username") + "";
+        }
+        if (srcMap.containsKey("password")) {
+            _password = srcMap.get("password") + "";
+        }
+        if (srcMap.containsKey("encrypted")) {
+            _encrypted = "true".equalsIgnoreCase(srcMap.get("encrypted") + "");
+        }
+        if (srcMap.containsKey("more")) {
+            _more = Tool.mapItemToMap(srcMap, "more");
         }
         return this;
     }

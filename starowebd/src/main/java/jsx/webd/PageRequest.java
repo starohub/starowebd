@@ -63,31 +63,31 @@ public class PageRequest {
         setup();
     }
 
-    protected PageRequest setup() {
+    private PageRequest setup() {
         put(new PageItem("_session", "Transferred Session", "Session which is transferred. NULL if not used.", IHTTPSession.class.getName(), null, null));
         get("_session").system(true);
         return this;
     }
 
-    public boolean hiddenVisible() {
+    public final boolean hiddenVisible() {
         return _hiddenVisible;
     }
 
-    public PageRequest hiddenVisible(boolean src) {
+    public final PageRequest hiddenVisible(boolean src) {
         _hiddenVisible = src;
         return this;
     }
 
-    public boolean systemVisible() {
+    public final boolean systemVisible() {
         return _systemVisible;
     }
 
-    public PageRequest systemVisible(boolean src) {
+    public final PageRequest systemVisible(boolean src) {
         _systemVisible = src;
         return this;
     }
 
-    public boolean has(String code) {
+    public final boolean has(String code) {
         if (_items.containsKey(code)) {
             PageItem pi = _items.get(code);
             return pi.value() != null;
@@ -96,16 +96,16 @@ public class PageRequest {
         }
     }
 
-    public PageRequest put(PageItem src) {
+    public final PageRequest put(PageItem src) {
         _items.put(src.code(), src);
         return this;
     }
 
-    public PageItem get(String code) {
+    public final PageItem get(String code) {
         return _items.get(code);
     }
 
-    public List<String> items() {
+    public final List<String> items() {
         List<String> tag = new ArrayList<>();
         for (String key : _items.keySet()) {
             tag.add(key);
@@ -113,52 +113,52 @@ public class PageRequest {
         return tag;
     }
 
-    public String uri() {
+    public final String uri() {
         return _uri;
     }
 
-    public PageRequest uri(String src) {
+    public final PageRequest uri(String src) {
         _uri = src;
         return this;
     }
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    public PageRequest code(String src) {
+    public final PageRequest code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    public PageRequest name(String src) {
+    public final PageRequest name(String src) {
         _name = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    public PageRequest desc(String src) {
+    public final PageRequest desc(String src) {
         _desc = src;
         return this;
     }
 
-    public String method() {
+    public final String method() {
         return _method;
     }
 
-    public PageRequest method(String src) {
+    public final PageRequest method(String src) {
         _method = src;
         return this;
     }
 
-    public PageRequest clone() {
+    public final PageRequest clone() {
         PageRequest pr = new PageRequest(code(), name(), desc(), method(), uri());
         List<String> items = items();
         for (int i = 0; i < items.size(); i++) {
@@ -168,7 +168,7 @@ public class PageRequest {
         return pr;
     }
 
-    public Map toMap() {
+    public final Map toMap() {
         Map tag = new HashMap();
         List<String> items = items();
         for (int i = 0; i < items.size(); i++) {
@@ -178,7 +178,7 @@ public class PageRequest {
         return tag;
     }
 
-    public PageRequest fromMap(Map src) {
+    public final PageRequest fromMap(Map src) {
         List<String> items = items();
         for (int i = 0; i < items.size(); i++) {
             PageItem pi = get(items.get(i));

@@ -35,13 +35,14 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.*;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
 import java.util.*;
 import java.util.logging.Level;
 
-public class DefaultFileSystemPage extends Page {
+public class DefaultFileSystemPage extends MasterPage {
     public DefaultFileSystemPage(WebDApi api) {
         super(api,"system.default_file_system", "Default File System", "Default file system page of StaroWebD.");
     }
@@ -49,7 +50,7 @@ public class DefaultFileSystemPage extends Page {
     public boolean accepted(final jsb.webd.SSession session) {
         if (!config().hasDefaultFileSystemPage()) return false;
 
-        FileItem item = new FileItem(sbObject(), session.uri());
+        FileItem item = new FileItem(api().blueprint(session).sbObject(), session.uri());
         if (item.kind().equalsIgnoreCase("not_found")) return false;
 
         return true;
@@ -77,12 +78,14 @@ public class DefaultFileSystemPage extends Page {
     public PageResponse run(PageRequest request) {
         PageResponse ps = responsePattern().clone();
         try {
+            SSession session = (SSession)request.get("_session").value();
+
             String uri = request.get("uri").value().toString().substring(1);
             if (uri.endsWith("/")) {
                 uri = uri.substring(0, uri.length() - 1);
             }
             uri = "/" + uri;
-            FileItem item = new FileItem(sbObject(), uri);
+            FileItem item = new FileItem(api().blueprint(session).sbObject(), uri);
 
             if (item.kind().equalsIgnoreCase("folder")) {
                 if (config().hasDefaultIndexPage()) {
@@ -90,19 +93,19 @@ public class DefaultFileSystemPage extends Page {
                     if (filepath.endsWith("/")) {
                         filepath = filepath.substring(0, filepath.length() - 1);
                     }
-                    FileItem indexItem = new FileItem(sbObject(), filepath + "/index.jsb");
+                    FileItem indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.jsb");
                     if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-sandbox")) {
                         item = indexItem;
                     } else {
-                        indexItem = new FileItem(sbObject(), filepath + "/index.jsm");
+                        indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.jsm");
                         if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("application/javascript-markup")) {
                             item = indexItem;
                         } else {
-                            indexItem = new FileItem(sbObject(), filepath + "/index.htm");
+                            indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.htm");
                             if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
                                 item = indexItem;
                             } else {
-                                indexItem = new FileItem(sbObject(), filepath + "/index.html");
+                                indexItem = new FileItem(api().blueprint(session).sbObject(), filepath + "/index.html");
                                 if (!indexItem.kind().equalsIgnoreCase("not_found") && indexItem.mime().equalsIgnoreCase("text/html")) {
                                     item = indexItem;
                                 }
@@ -112,24 +115,22 @@ public class DefaultFileSystemPage extends Page {
                 }
             }
             if (item.mime().equalsIgnoreCase("application/javascript-sandbox")) {
-                SSession session = (SSession)request.get("_session").value();
                 api().markup().renderJSB(session, ps, item.name(), uri, item.filepath());
                 return ps;
             }
             if (item.mime().equalsIgnoreCase("application/javascript-markup")) {
-                SSession session = (SSession)request.get("_session").value();
                 api().markup().renderJSM(session, this, ps, uri, item.filepath());
                 return ps;
             }
             if (item.kind().equalsIgnoreCase("file")) {
-                api().markup().renderFile(ps, item.filepath(), item.mime());
+                api().markup().renderFile(session, ps, item.filepath(), item.mime());
                 return ps;
             }
             if (item.kind().equalsIgnoreCase("folder")) {
                 Map args = new HashMap();
                 List<FileItem> items = item.children();
-                FileItem current = new FileItem(sbObject(), item.filepath());
-                FileItem parent = new FileItem(sbObject(), item.parent());
+                FileItem current = new FileItem(api().blueprint(session).sbObject(), item.filepath());
+                FileItem parent = new FileItem(api().blueprint(session).sbObject(), item.parent());
                 current.name("[ . ]");
                 current.kind("current");
                 parent.name("[ .. ]");
@@ -145,9 +146,8 @@ public class DefaultFileSystemPage extends Page {
 
             throw new Exception("Not recognized item.");
         } catch (Throwable e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

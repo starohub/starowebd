@@ -40,24 +40,24 @@ import jsb.SFile;
 import java.util.Map;
 
 public class Redirect {
-    private WebDApi _api;
+    private BluePrint _blueprint;
 
-    public Redirect(WebDApi api) {
-        _api = api;
+    public Redirect(BluePrint blueprint) {
+        _blueprint = blueprint;
     }
 
-    public WebDApi api() {
-        return _api;
+    public final BluePrint blueprint() {
+        return _blueprint;
     }
 
-    public String findJSRFile(String uri) {
+    public final String findJSRFile(String uri) {
         String path = uri;
         int end = path.length();
         int idx = path.lastIndexOf("/", end);
         while (idx >= 0) {
             path = path.substring(0, idx);
             try {
-                SFile sfile = api().sbObject().sandbox().machine().mnt().newFile(path + "/index.jsr");
+                SFile sfile = blueprint().sbObject().sandbox().machine().mnt().newFile(path + "/index.jsr");
                 if (sfile.exists()) return path + "/index.jsr";
             } catch (Throwable e) {
 
@@ -68,19 +68,19 @@ public class Redirect {
         return null;
     }
 
-    public String redirect(String uri) {
+    public final String redirect(String uri) {
         String jsrFile = findJSRFile(uri);
         if (jsrFile == null) return null;
         return redirect(jsrFile, uri);
     }
 
-    public String rootURI(String uri) {
+    public final String rootURI(String uri) {
         String jsrFile = findJSRFile(uri);
         if (jsrFile == null) return "/";
         return rootJSR(jsrFile);
     }
 
-    public String rootJSR(String jsrFile) {
+    public final String rootJSR(String jsrFile) {
         String root = jsrFile;
         int idx = root.lastIndexOf("/");
         if (idx >= 0) {
@@ -89,11 +89,11 @@ public class Redirect {
         return root;
     }
 
-    public String redirect(String jsrFile, String uri) {
+    public final String redirect(String jsrFile, String uri) {
         String root = rootJSR(jsrFile);
         String path = uri.substring(root.length());
         try {
-            SFile sfile = api().sbObject().sandbox().machine().mnt().newFile(jsrFile);
+            SFile sfile = blueprint().sbObject().sandbox().machine().mnt().newFile(jsrFile);
             String jsonStr = new String(sfile.readFile(), "UTF-8");
             java.util.List rules = Tool.jsonToList(jsonStr);
             for (int i = 0; i < rules.size(); i++) {

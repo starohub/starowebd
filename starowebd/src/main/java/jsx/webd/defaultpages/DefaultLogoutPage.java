@@ -35,22 +35,27 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
 import java.util.logging.Level;
 
-public class DefaultLogoutPage extends Page {
-
+public class DefaultLogoutPage extends MasterPage {
     public DefaultLogoutPage(WebDApi api) {
         super(api,"system.default_logout", "Default Logout Page", "Provide authentication.");
     }
 
     public boolean accepted(final SSession session) {
         VHost vh = config().vhostList().find(session.host());
-        if (vh == null) return false;
-        if (!vh.passwordProtected()) return false;
-        if (!api().sessionData().getOnline(session)) return false;
+        if (session.proxyHost() != null) {
+            vh = config().vhostList().find(session.proxyHost());
+            if (vh == null) return false;
+        } else {
+            if (vh == null) return false;
+            if (!vh.passwordProtected()) return false;
+            if (!api().sessionData().getOnline(session)) return false;
+        }
         String path = session.uri().toLowerCase();
         if (path.startsWith("/logout.yo")) {
             return true;
@@ -82,9 +87,8 @@ public class DefaultLogoutPage extends Page {
             ps.get("_redirect").value("/");
             return ps;
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

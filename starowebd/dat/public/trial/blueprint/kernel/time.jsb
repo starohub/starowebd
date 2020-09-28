@@ -8,11 +8,11 @@ function __exec__(data) {
 		
 	var args = util.newHashMap();
 	
-	var krn = webd.blueprint().kernel("com.starohub.trial.kernel");
+	var krn = webd.blueprint(session).kernel("com.starohub.trial.kernel");
 	args.put('time', krn.currentTime());
 	
 	var output = util.newHashMap();
-	var atw = webd.blueprint().artWork("com.starohub.trial.artwork");
+	var atw = webd.blueprint(session).artwork("com.starohub.trial.artwork");
 	output.put('_return_html', atw.mergeHtml('common', 'time.vm', null, args));
 	
 	data.output(output);

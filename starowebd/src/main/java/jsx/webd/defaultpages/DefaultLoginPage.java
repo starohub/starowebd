@@ -35,28 +35,29 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.Tool;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsb.webd.SSession;
 import jsx.webd.*;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultLoginPage extends Page {
-
+public class DefaultLoginPage extends MasterPage {
     public DefaultLoginPage(WebDApi api) {
         super(api,"system.default_login", "Default Login Page", "Provide authentication.");
     }
 
     public boolean accepted(final jsb.webd.SSession session) {
         VHost vh = config().vhostList().find(session.host());
-        if (vh == null) return false;
-        if (!vh.passwordProtected()) return false;
-        if (api().sessionData().getOnline(session)) return false;
+        if (session.proxyHost() != null) {
+            vh = config().vhostList().find(session.proxyHost());
+            if (vh == null) return false;
+        } else {
+            if (vh == null) return false;
+            if (!vh.passwordProtected()) return false;
+            if (api().sessionData().getOnline(session)) return false;
+        }
         String path = session.uri().toLowerCase();
         if (path.startsWith("/login.yo")) {
             return true;
@@ -102,6 +103,9 @@ public class DefaultLoginPage extends Page {
             String message = "";
             if ("POST".equalsIgnoreCase(session.method())) {
                 VHost vh = config().vhostList().find(session.host());
+                if (session.proxyHost() != null) {
+                    vh = config().vhostList().find(session.proxyHost());
+                }
                 if (!vh.validate(username, password)) {
                     message = "Username and password do not match!";
                 } else {
@@ -122,9 +126,8 @@ public class DefaultLoginPage extends Page {
             args.put("message", message);
             theme(ps, "Login.vm", args);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            platform().log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

@@ -35,6 +35,7 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.*;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsx.webd.*;
 
 import java.io.BufferedReader;
@@ -44,8 +45,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class PublicIPPage extends Page {
-
+public class PublicIPPage extends MasterPage {
     public PublicIPPage(WebDApi api) {
         super(api,"system.public_ip", "Public IP", "Receive public IP.");
         docVisible(true);
@@ -106,9 +106,8 @@ public class PublicIPPage extends Page {
 
             ps.get("ip").value(ip);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }

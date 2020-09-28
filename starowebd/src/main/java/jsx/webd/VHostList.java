@@ -39,15 +39,41 @@ import com.starohub.webd.Tool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class VHostList {
+public final class VHostList {
     private List<VHost> _hosts = new ArrayList<>();
+    private VHost _masterHost;
+    private String _masterToken = UUID.randomUUID().toString().replaceAll("-", "");
 
-    public List<VHost> hosts() {
-        return _hosts;
+    VHostList() {}
+
+    public final boolean validToken(String masterToken) {
+        if (!_masterToken.equalsIgnoreCase(masterToken)) return false;
+        if (_masterHost == null) return false;
+        return true;
     }
 
-    public VHost find(String host) {
+    public final VHost masterHost() {
+        return _masterHost;
+    }
+
+    public final VHostList masterHost(VHost src) {
+        if (_masterHost == null) {
+            _masterHost = src;
+        }
+        return this;
+    }
+
+    public final int size() {
+        return _hosts.size();
+    }
+
+    public final VHost get(int idx) {
+        return _hosts.get(idx);
+    }
+
+    public final VHost find(String host) {
         for (int i = 0; i < _hosts.size(); i++) {
             if (host.equalsIgnoreCase(_hosts.get(i).host())) {
                 return _hosts.get(i);
@@ -56,7 +82,7 @@ public class VHostList {
         return null;
     }
 
-    public List toList() {
+    public final List toList() {
         List tag = new ArrayList();
         for (VHost h : _hosts) {
             tag.add(h.toMap());
@@ -64,12 +90,20 @@ public class VHostList {
         return tag;
     }
 
-    public VHostList fromList(List srcList) {
+    public final VHostList fromList(List srcList) {
         _hosts = new ArrayList<>();
         for (int i = 0; i < srcList.size(); i++) {
             Map srcMap = Tool.listItemToMap(srcList, i);
-            VHost h = new VHost(srcMap.get("host") + "", 80);
+            VHost h = new VHost(srcMap.get("host") + "", 80, this);
             h.fromMap(srcMap);
+            if (h.isMaster()) {
+                if (masterHost() == null) {
+                    masterHost(h);
+                } else {
+                    h.isMaster(false);
+                }
+            }
+            h.lock(_masterToken);
             _hosts.add(h);
         }
         return this;

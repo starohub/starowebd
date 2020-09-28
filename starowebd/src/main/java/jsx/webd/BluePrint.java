@@ -35,10 +35,10 @@
 package jsx.webd;
 
 import com.starohub.jsb.SBObject;
+import com.starohub.webd.sandbox.DefaultSBObject;
 import jsb.SFile;
 import jsb.webd.*;
 
-import javax.xml.crypto.Data;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,49 +47,107 @@ import java.util.Map;
 
 public abstract class BluePrint {
     private jsx.seller.PSoftware _license;
-    private WebDApi _api;
+    private SSession _session;
+    private PageFactory _pageFactory;
     private Map<String, Kernel> _kernelMap = new HashMap<>();
-    private Map<String, ArtWork> _artWorkMap = new HashMap<>();
-    private Map<String, DataSet> _dataSetMap = new HashMap<>();
+    private Map<String, ArtWork> _artworkMap = new HashMap<>();
+    private Map<String, DataSet> _datasetMap = new HashMap<>();
+    private Redirect _redirect;
+    private VHost _host;
+    private SBObject _sbObject;
+    private Map _more;
+    private WebDApi _api;
+    private Platform _platform;
 
     private String _code;
     private String _name;
     private String _version;
     private String _desc;
 
-    public BluePrint(WebDApi api) {
-        _api = api;
+    public BluePrint(Map more) {
+        _session = (SSession)more.get("session");
+        _host = (VHost)more.get("host");
+        _host.session(_session);
+        _host.blueprint(this);
+        _more = more;
+        _api = (WebDApi)more.get("api");
+        _platform = (Platform)more.get("platform");
+        more.remove("api");
+        more.remove("session");
+        more.remove("host");
         setInfo();
-        _license = createLicense(api, api.config().blueprintLicense());
+        _pageFactory = createPageFactory();
+        _redirect = createRedirect();
+        _license = createLicense(this, _host.blueprintLicense());
         createKernelMap(_kernelMap);
-        createArtWorkMap(_artWorkMap);
-        createDataSetMap(_dataSetMap);
-        createPages(api);
+        createArtWorkMap(_artworkMap);
+        createDataSetMap(_datasetMap);
+        createPages(_pageFactory);
+        syncVUsers();
     }
 
-    public WebDApi api() {
-        return _api;
+    public final Platform platform() {
+        return _platform;
     }
 
-    public SBObject sbObject() {
-        return api().sbObject();
+    public final Map more() {
+        return _more;
     }
 
-    public Config config() { return api().config(); }
+    public final SSession session() {
+        return _session;
+    }
 
-    public jsx.seller.PSoftware license() {
+    public final VHost host() {
+        return _host;
+    }
+
+    public final PageFactory pageFactory() {
+        return _pageFactory;
+    }
+
+    private final PageFactory createPageFactory() {
+        return new PageFactory(this);
+    }
+
+    private BluePrint syncVUsers() {
+        for (int i = 0; i < host().users().size(); i++) {
+            VUser u = host().users().get(i);
+            u.load();
+        }
+        return this;
+    }
+
+    public final Redirect redirect() { return _redirect; }
+
+    public final SBObject sbObject() {
+        if (_sbObject == null) {
+            String js = "function __exec__(data) {}";
+            Map more = new HashMap();
+            more.put("session", session());
+            more.put("api", _api);
+            _sbObject = new DefaultSBObject(js, host().pageTimeout(), _api, session(), more);
+        }
+        return _sbObject;
+    }
+
+    protected final Redirect createRedirect() {
+        return new jsx.webd.Redirect(this);
+    }
+
+    public final jsx.seller.PSoftware license() {
         return _license;
     }
 
-    protected abstract void createPages(WebDApi api);
+    protected abstract void createPages(PageFactory pageFactory);
     protected abstract void setInfo();
-    protected abstract jsx.seller.PSoftware createLicense(WebDApi api, String licFile);
-    public abstract SBluePrint createSBluePrint(SPackage pkg, WebDApi api, BluePrint blueprint);
-    public abstract SArtWork createSArtWork(SPackage pkg, WebDApi api, ArtWork artwork);
-    public abstract SDataSet createSDataSet(SPackage pkg, WebDApi api, DataSet dataset);
-    public abstract SKernel createSKernel(SPackage pkg, WebDApi api, Kernel kernel);
+    protected abstract jsx.seller.PSoftware createLicense(BluePrint blueprint, String licFile);
+    public abstract SBluePrint createSBluePrint(SPackage pkg, BluePrint blueprint);
+    public abstract SArtWork createSArtWork(SPackage pkg, SBluePrint blueprint, ArtWork artwork);
+    public abstract SDataSet createSDataSet(SPackage pkg, SBluePrint blueprint, DataSet dataset);
+    public abstract SKernel createSKernel(SPackage pkg, SBluePrint blueprint, Kernel kernel);
 
-    protected BluePrint createKernelMap(Map<String, Kernel> map) {
+    protected final BluePrint createKernelMap(Map<String, Kernel> map) {
         try {
             String libDir = "/bpt/" + code() + "/kernel";
             SFile libFile = sbObject().sandbox().machine().mnt().newFile(libDir);
@@ -112,20 +170,20 @@ public abstract class BluePrint {
                         Kernel kn = (Kernel) ctor.newInstance((BluePrint)this, libDir + "/" + code + "/license.lic");
                         if (kn.license() != null && kn.license().valid()) {
                             map.put(code, kn);
-                            api().config().platform().log("Loaded kernel [" + code + "] (" + name + ") ...");
+                            platform().log("Loaded kernel [" + code + "] (" + name + ") ...");
                         } else {
-                            api().config().platform().log("Failed to load kernel [" + code + "] (" + name + "): Invalid license ...");
+                            platform().log("Failed to load kernel [" + code + "] (" + name + "): Invalid license ...");
                         }
                     }
                 }
             }
         } catch (Throwable e) {
-            api().config().platform().log(e);
+            platform().log(e);
         }
         return this;
     }
 
-    public List<String> kernelList() {
+    public final List<String> kernelList() {
         List<String> tag = new ArrayList<>();
         for (String key : _kernelMap.keySet()) {
             tag.add(key);
@@ -133,7 +191,7 @@ public abstract class BluePrint {
         return tag;
     }
 
-    public Kernel kernel(String code) {
+    public final Kernel kernel(String code) {
         if (_kernelMap.containsKey(code)) {
             return _kernelMap.get(code);
         } else {
@@ -141,7 +199,7 @@ public abstract class BluePrint {
         }
     }
 
-    protected BluePrint createArtWorkMap(Map<String, ArtWork> map) {
+    protected final BluePrint createArtWorkMap(Map<String, ArtWork> map) {
         try {
             String libDir = "/bpt/" + code() + "/artwork";
             SFile libFile = sbObject().sandbox().machine().mnt().newFile(libDir);
@@ -164,36 +222,36 @@ public abstract class BluePrint {
                         ArtWork kn = (ArtWork) ctor.newInstance((BluePrint)this, libDir + "/" + code + "/license.lic");
                         if (kn.license() != null && kn.license().valid()) {
                             map.put(code, kn);
-                            api().config().platform().log("Loaded artwork [" + code + "] (" + name + ") ...");
+                            platform().log("Loaded artwork [" + code + "] (" + name + ") ...");
                         } else {
-                            api().config().platform().log("Failed to load artwork [" + code + "] (" + name + "): Invalid license ...");
+                            platform().log("Failed to load artwork [" + code + "] (" + name + "): Invalid license ...");
                         }
                     }
                 }
             }
         } catch (Throwable e) {
-            api().config().platform().log(e);
+            platform().log(e);
         }
         return this;
     }
 
-    public List<String> artWorkList() {
+    public final List<String> artworkList() {
         List<String> tag = new ArrayList<>();
-        for (String key : _artWorkMap.keySet()) {
+        for (String key : _artworkMap.keySet()) {
             tag.add(key);
         }
         return tag;
     }
 
-    public ArtWork artWork(String code) {
-        if (_artWorkMap.containsKey(code)) {
-            return _artWorkMap.get(code);
+    public final ArtWork artwork(String code) {
+        if (_artworkMap.containsKey(code)) {
+            return _artworkMap.get(code);
         } else {
             return null;
         }
     }
 
-    protected BluePrint createDataSetMap(Map<String, DataSet> map) {
+    protected final BluePrint createDataSetMap(Map<String, DataSet> map) {
         try {
             String libDir = "/bpt/" + code() + "/dataset";
             SFile libFile = sbObject().sandbox().machine().mnt().newFile(libDir);
@@ -216,67 +274,67 @@ public abstract class BluePrint {
                         DataSet kn = (DataSet) ctor.newInstance((BluePrint)this, libDir + "/" + code + "/license.lic");
                         if (kn.license() != null && kn.license().valid()) {
                             map.put(code, kn);
-                            api().config().platform().log("Loaded dataset [" + code + "] (" + name + ") ...");
+                            platform().log("Loaded dataset [" + code + "] (" + name + ") ...");
                         } else {
-                            api().config().platform().log("Failed to load dataset [" + code + "] (" + name + "): Invalid license ...");
+                            platform().log("Failed to load dataset [" + code + "] (" + name + "): Invalid license ...");
                         }
                     }
                 }
             }
         } catch (Throwable e) {
-            api().config().platform().log(e);
+            platform().log(e);
         }
         return this;
     }
 
-    public List<String> dataSetList() {
+    public final List<String> dataSetList() {
         List<String> tag = new ArrayList<>();
-        for (String key : _dataSetMap.keySet()) {
+        for (String key : _datasetMap.keySet()) {
             tag.add(key);
         }
         return tag;
     }
 
-    public DataSet dataSet(String code) {
-        if (_dataSetMap.containsKey(code)) {
-            return _dataSetMap.get(code);
+    public final DataSet dataset(String code) {
+        if (_datasetMap.containsKey(code)) {
+            return _datasetMap.get(code);
         } else {
             return null;
         }
     }
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    protected BluePrint code(String src) {
+    protected final BluePrint code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    protected BluePrint name(String src) {
+    protected final BluePrint name(String src) {
         _name = src;
         return this;
     }
 
-    public String version() {
+    public final String version() {
         return _version;
     }
 
-    protected BluePrint version(String src) {
+    protected final BluePrint version(String src) {
         _version = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    protected BluePrint desc(String src) {
+    protected final BluePrint desc(String src) {
         _desc = src;
         return this;
     }

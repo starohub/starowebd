@@ -56,13 +56,23 @@ public abstract class SSession {
     protected Map<String, String> _params;
     protected Map<String, String> _headers;
     protected Map<String, String> _files;
+    protected String _proxyHost;
+
+    public final String proxyHost() {
+        return _proxyHost;
+    }
+
+    public final SSession proxyHost(String src) {
+        _proxyHost = src;
+        return this;
+    }
 
     public SSession(WebDApi api, Object source) {
         _api = api;
         _source = source;
     }
 
-    protected SSession setup() {
+    protected final SSession setup() {
         _uri = createUri();
         _method = createMethod();
         _sessionId = createSessionId();
@@ -74,7 +84,7 @@ public abstract class SSession {
         return this;
     }
 
-    protected WebDApi api() {
+    protected final WebDApi api() {
         return _api;
     }
 
@@ -90,7 +100,7 @@ public abstract class SSession {
 
     public final int port() { return _port; }
 
-    public String sessionId() {
+    public final String sessionId() {
         return _sessionId;
     }
 
@@ -130,25 +140,25 @@ public abstract class SSession {
 
     public abstract String queryString();
 
-    public SSession setData(String name, Object value) {
+    public final SSession setData(String name, Object value) {
         api().sessionData().set(this, name, value);
         return this;
     }
 
-    public Object getData(String name, Object defValue) {
+    public final Object getData(String name, Object defValue) {
         return api().sessionData().get(this, name, defValue);
     }
 
-    public SSession clearData() {
+    public final SSession clearData() {
         api().sessionData().clear(this);
         return this;
     }
 
-    public boolean hasFile(String name) {
+    public final boolean hasFile(String name) {
         return files().containsKey(name);
     }
 
-    public SSession saveFile(String name, String path) throws SException {
+    public final SSession saveFile(String name, String path) throws SException {
         if (!hasFile(name)) return this;
         try {
             String parent = path;
@@ -156,11 +166,11 @@ public abstract class SSession {
             if (idx >= 0) {
                 parent = parent.substring(0, idx);
             }
-            api().sbObject().sandbox().machine().mnt().newFile(parent).mkdirs();
+            api().sbObject(this).sandbox().machine().mnt().newFile(parent).mkdirs();
 
             String tmpFile = files().get(name);
             FileInputStream fis = new FileInputStream(tmpFile);
-            SFile sfile = api().sbObject().sandbox().machine().mnt().newFile(path);
+            SFile sfile = api().sbObject(this).sandbox().machine().mnt().newFile(path);
             SOutputStream fos = sfile.outputStream();
             byte[] buffer = new byte[1024];
             int read = fis.read(buffer, 0, buffer.length);
@@ -171,12 +181,12 @@ public abstract class SSession {
             fis.close();
             fos.close();
         } catch (Throwable e) {
-            throw api().sbObject().sandbox().machine().io().newException(e);
+            throw api().sbObject(this).sandbox().machine().io().newException(e);
         }
         return this;
     }
 
-    protected String getHostFromHeaders() {
+    protected final String getHostFromHeaders() {
         String tag = "localhost:80";
         for (String key : _headers.keySet()) {
             if ("host".equalsIgnoreCase(key)) {
@@ -186,7 +196,7 @@ public abstract class SSession {
         return tag;
     }
 
-    public Map toMap() {
+    public final Map toMap() {
         Map tag = new HashMap();
         tag.put("uri", uri());
         tag.put("sessionId", sessionId());
@@ -196,14 +206,20 @@ public abstract class SSession {
         tag.put("params", params());
         tag.put("headers", headers());
         tag.put("files", files());
+        tag.put("proxyHost", proxyHost());
         return tag;
     }
 
-    public SSession fromMap(Map srcMap) {
+    public final SSession fromMap(Map srcMap) {
         _uri = srcMap.get("uri") + "";
         _method = srcMap.get("method") + "";
         _sessionId = srcMap.get("sessionId") + "";
         _host = srcMap.get("host") + "";
+        if (srcMap.get("proxyHost") == null) {
+            _proxyHost = null;
+        } else {
+            _proxyHost = srcMap.get("proxyHost") + "";
+        }
         try {
             _port = Integer.parseInt((srcMap.get("port") + "").replaceAll("\\.0", ""));
         } catch (Exception e) {

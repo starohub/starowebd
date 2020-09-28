@@ -37,9 +37,7 @@ package com.starohub.webd.sandbox.webd;
 import jsb.SMachine;
 import jsb.webd.SBluePrint;
 import jsb.webd.SPackage;
-import jsb.webd.SRedirect;
 import jsx.webd.BluePrint;
-import jsx.webd.Redirect;
 import jsx.webd.WebDApi;
 
 import java.util.Map;
@@ -50,12 +48,7 @@ public class Package extends jsb.webd.SPackage {
     }
 
     @Override
-    protected SBluePrint createBluePrint(SPackage pkg, WebDApi api, BluePrint blueprint) {
-        return new DefaultBluePrint(pkg, api, blueprint);
-    }
-
-    @Override
-    protected SRedirect createRedirect(SPackage pkg, WebDApi api, Redirect redirect) {
-        return new SRedirect(pkg, api, redirect);
+    protected SBluePrint createBluePrint(SPackage pkg, BluePrint blueprint) {
+        return new DefaultBluePrint(pkg, blueprint);
     }
 }

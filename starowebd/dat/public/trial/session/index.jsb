@@ -41,7 +41,7 @@ function __exec__(data) {
 	args.put('host', session.host());
 	args.put('port', session.port() + '');
 	
-	webd.theme(output, '/trial/session/index.vm', args);
+	webd.theme(session, output, '/trial/session/index.vm', args);
 	
 	data.output(output);
 }

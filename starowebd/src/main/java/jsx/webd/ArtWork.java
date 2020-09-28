@@ -34,8 +34,6 @@
 
 package jsx.webd;
 
-import com.starohub.jsb.DefaultFileSystem;
-import jsb.SFileSystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
@@ -57,67 +55,69 @@ public abstract class ArtWork {
         _blueprint = blueprint;
         setInfo();
         _license = createLicense(blueprint, licFile);
-        createPages(blueprint.api());
+        createPages();
     }
 
-    protected abstract void createPages(WebDApi api);
+    protected abstract void createPages();
 
-    public jsx.seller.PSoftware license() {
+    public final jsx.seller.PSoftware license() {
         return _license;
     }
 
-    public BluePrint blueprint() {
+    public final BluePrint blueprint() {
         return _blueprint;
     }
 
     protected abstract void setInfo();
     protected abstract jsx.seller.PSoftware createLicense(BluePrint blueprint, String licFile);
 
-    public String code() {
+    public final String code() {
         return _code;
     }
 
-    protected ArtWork code(String src) {
+    protected final ArtWork code(String src) {
         _code = src;
         return this;
     }
 
-    public String name() {
+    public final String name() {
         return _name;
     }
 
-    protected ArtWork name(String src) {
+    protected final ArtWork name(String src) {
         _name = src;
         return this;
     }
 
-    public String version() {
+    public final String version() {
         return _version;
     }
 
-    protected ArtWork version(String src) {
+    protected final ArtWork version(String src) {
         _version = src;
         return this;
     }
 
-    public String desc() {
+    public final String desc() {
         return _desc;
     }
 
-    protected ArtWork desc(String src) {
+    protected final ArtWork desc(String src) {
         _desc = src;
         return this;
     }
 
-    public void theme(PageResponse output, String code, String path, String data, Map args) throws Exception {
+    public final ArtWork theme(PageResponse output, String code, String path, String data, Map args) throws Exception {
         output.get("_return_html").value(mergeHtml(code, path, data, args));
+        return this;
     }
 
-    public void theme(Map outputMap, String code, String path, String data, Map args) throws Exception {
+    public final ArtWork theme(Map outputMap, String code, String path, String data, Map args) throws Exception {
         outputMap.put("_return_html", mergeHtml(code, path, data, args));
+        return this;
     }
 
-    public String mergeHtml(String code, String path, String data, Map args) throws Exception {
+    public final String mergeHtml(String code, String path, String data, Map args) throws Exception {
         String template = data;
         if (data == null) {
             template = new String(loadTemplate(code, path), "UTF-8");
@@ -125,8 +125,8 @@ public abstract class ArtWork {
         try {
             Velocity.init();
         } catch (Throwable e) {
-            if (blueprint().api().config().platform() != null) {
-                blueprint().api().config().platform().log(e);
+            if (blueprint().platform() != null) {
+                blueprint().platform().log(e);
             }
         }
         VelocityContext ctx = new VelocityContext();
@@ -142,7 +142,7 @@ public abstract class ArtWork {
 
     protected abstract byte[] loadResource(String code, String path);
 
-    protected byte[] loadTemplate(String code, String path) {
+    protected final byte[] loadTemplate(String code, String path) {
         String filename = "/templates/" + path;
         return loadResource(code, filename);
     }

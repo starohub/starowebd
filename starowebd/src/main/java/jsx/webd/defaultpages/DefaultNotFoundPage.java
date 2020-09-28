@@ -35,14 +35,14 @@
 package jsx.webd.defaultpages;
 
 import com.starohub.webd.*;
+import com.starohub.webd.sandbox.webd.MasterPage;
 import jsx.webd.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DefaultNotFoundPage extends Page {
-
+public class DefaultNotFoundPage extends MasterPage {
     public DefaultNotFoundPage(WebDApi api) {
         super(api,"system.default_not_found", "Default Not Found", "Default not found page of StaroWebD.");
     }
@@ -81,9 +81,8 @@ public class DefaultNotFoundPage extends Page {
             args.put("uri", request.get("uri").value().toString());
             theme(ps,"NotFound.vm", args);
         } catch (Exception e) {
-            Tool.LOG.log(Level.SEVERE, "Failed to view page: ", e);
-            config().platform().log("Failed to view page: " + Tool.stacktrace(e));
-            Tool.copyError(ps, e);
+            log("Failed to view page: " + stacktrace(e));
+            copyError(ps, e);
         }
         return ps;
     }
