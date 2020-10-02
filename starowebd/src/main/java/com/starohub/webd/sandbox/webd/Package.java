@@ -51,4 +51,16 @@ public class Package extends jsb.webd.SPackage {
     protected SBluePrint createBluePrint(SPackage pkg, BluePrint blueprint) {
         return new DefaultBluePrint(pkg, blueprint);
     }
+
+    protected jsb.SPackage setupVisible() {
+        customVisible("com.starohub.webd.sandbox.webd.DefaultArtWork", false);
+        customVisible("com.starohub.webd.sandbox.webd.DefaultBluePrint", false);
+        customVisible("com.starohub.webd.sandbox.webd.DefaultDataSet", false);
+        customVisible("com.starohub.webd.sandbox.webd.DefaultKernel", false);
+        customVisible("com.starohub.webd.sandbox.webd.DefaultSession", false);
+        customVisible("com.starohub.webd.sandbox.webd.Package", false);
+        customVisible("com.starohub.webd.sandbox.webd.PseudoSession", false);
+        customVisible("com.starohub.webd.sandbox.WebDMod", false);
+        return this;
+    }
 }

@@ -430,6 +430,19 @@ public class Tool {
         src.put("_error", stacktrace(e));
     }
 
+    public static String replaceAll(String src, String find, String repl) {
+        String tag = "";
+        int begin = 0;
+        int idx = src.indexOf(find, begin);
+        while (idx >= 0) {
+            tag += src.substring(begin, idx) + repl;
+            begin = idx + find.length();
+            idx = src.indexOf(find, begin);
+        }
+        tag += src.substring(begin);
+        return tag;
+    }
+
     public static String mapItemToString(Map inputMap, String key) {
         if (inputMap == null) return "";
         if (!inputMap.containsKey(key)) return "";

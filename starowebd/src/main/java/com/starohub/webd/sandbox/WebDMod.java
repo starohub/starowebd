@@ -57,11 +57,4 @@ public class WebDMod extends jsb.SModule {
     protected SPackageStore createPackages(Map more) {
         return new WebDPackageStore((WebDApi)more.get("api"), this.machine(), more);
     }
-
-    public boolean visibleToScripts(String className) {
-        if (super.visibleToScripts(className)) return true;
-        if (className.startsWith("com.starohub.webd.sandbox.webd.")) return true;
-        return false;
-    }
-
 }

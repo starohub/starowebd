@@ -55,6 +55,7 @@ public class WebDPackageStore extends jsb.SPackageStore {
     @Override
     protected SPackageStore setStore(Map more) {
         pkg("webd", new com.starohub.webd.sandbox.webd.Package((WebDApi)more.get("api"), this.machine(), more));
+
         return this;
     }
 }

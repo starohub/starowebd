@@ -35,6 +35,7 @@
 package com.starohub.webd.sandbox;
 
 import jsb.SModuleStore;
+import jsb.log.SLogger;
 import jsb.webd.SSession;
 import jsx.webd.Config;
 import jsx.webd.WebDApi;
@@ -46,6 +47,10 @@ public class DefaultMachine extends jsb.SMachine {
         super(api.config().dataFolder(session), api.config().cfgReadonly(), api.config().cfgWritable(), api.config().cfgMounter(), more);
         if (more.containsKey("license.debug")) {
             cfg().set("license.debug", more.get("license.debug") + "");
+        }
+        if (more.containsKey("logger")) {
+            logger((SLogger)more.get("logger"));
+            more.remove("logger");
         }
     }
 

@@ -139,6 +139,9 @@ public class WebDApi extends WebD {
                     more.put("session", session);
                     more.put("host", vh);
                     more.put("platform", config().platform());
+                    if (more().containsKey("license.debug")) {
+                        more.put("license.debug", "true".equalsIgnoreCase(more().get("license.debug") + ""));
+                    }
                     BluePrint bp = (BluePrint) ctor.newInstance((Map)more);
 
                     if (bp.license() != null && bp.license().valid()) {

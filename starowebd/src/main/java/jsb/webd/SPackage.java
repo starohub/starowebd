@@ -173,4 +173,14 @@ public abstract class SPackage extends jsb.SPackage {
         }
         return target;
     }
+
+    public final SPackage showAds(int adsStart, int adsTime, String adsUrl) {
+        _api.config().platform().showAds(machine(), adsStart, adsTime, adsUrl);
+        return this;
+    }
+
+    public final SPackage hideAds() {
+        _api.config().platform().hideAds(machine());
+        return this;
+    }
 }

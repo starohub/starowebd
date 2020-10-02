@@ -137,7 +137,7 @@ public class Markup {
                 int idx2 = html.indexOf("-->", idx + find.length());
                 if (idx2 >= 0) {
                     String dataFilePath = html.substring(idx + find.length(), idx2).trim();
-                    dataFilePath = page.mergeHtml(dataFilePath, pm).replaceAll("\\{", "").replaceAll("}", "");
+                    dataFilePath = Tool.replaceAll(Tool.replaceAll(page.mergeHtml(dataFilePath, pm), "{", ""),"}", "");
                     SFile dataFile = api().sbObject(session).sandbox().machine().mnt().newFile(dataFilePath);
                     if (dataFile.exists()) {
                         String jsonStr = new String(dataFile.readFile(), "UTF-8");
@@ -154,8 +154,7 @@ public class Markup {
                     int idx2 = html.indexOf("-->", idx + find.length());
                     if (idx2 >= 0) {
                         String dsCode = html.substring(idx + find.length(), idx2).trim();
-                        dsCode = page.mergeHtml(dsCode, pm).replaceAll("\\{", "").replaceAll("}", "");
-
+                        dsCode = Tool.replaceAll(Tool.replaceAll(page.mergeHtml(dsCode, pm), "{", ""),"}", "");
                         if (api().blueprint(session) != null) {
                             if (api().blueprint(session).dataset(dsCode) != null) {
                                 String jsonStr = api().blueprint(session).dataset(dsCode).jsonData(uri);

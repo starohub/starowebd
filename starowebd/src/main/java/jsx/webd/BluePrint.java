@@ -126,6 +126,10 @@ public abstract class BluePrint {
             Map more = new HashMap();
             more.put("session", session());
             more.put("api", _api);
+            if (more().containsKey("license.debug")) {
+                more.put("license.debug", "true".equalsIgnoreCase(more().get("license.debug") + ""));
+            }
+            more.put("logger", new Logger(this));
             _sbObject = new DefaultSBObject(js, host().pageTimeout(), _api, session(), more);
         }
         return _sbObject;
@@ -173,6 +177,7 @@ public abstract class BluePrint {
                             platform().log("Loaded kernel [" + code + "] (" + name + ") ...");
                         } else {
                             platform().log("Failed to load kernel [" + code + "] (" + name + "): Invalid license ...");
+                            platform().log("License is null: " + (kn.license() == null));
                         }
                     }
                 }
@@ -225,6 +230,7 @@ public abstract class BluePrint {
                             platform().log("Loaded artwork [" + code + "] (" + name + ") ...");
                         } else {
                             platform().log("Failed to load artwork [" + code + "] (" + name + "): Invalid license ...");
+                            platform().log("License is null: " + (kn.license() == null));
                         }
                     }
                 }
@@ -277,6 +283,7 @@ public abstract class BluePrint {
                             platform().log("Loaded dataset [" + code + "] (" + name + ") ...");
                         } else {
                             platform().log("Failed to load dataset [" + code + "] (" + name + "): Invalid license ...");
+                            platform().log("License is null: " + (kn.license() == null));
                         }
                     }
                 }

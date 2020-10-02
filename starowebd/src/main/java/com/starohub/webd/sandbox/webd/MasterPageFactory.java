@@ -159,7 +159,7 @@ public class MasterPageFactory extends PageFactory {
                         if (idx >= 0) {
                             path = path.substring(0, idx);
                         }
-                        if (!"/proxy.yo".equalsIgnoreCase(path) && !"/login.yo".equalsIgnoreCase(path) && !"/logout.yo".equalsIgnoreCase(path) && !"/password.yo".equalsIgnoreCase(path) && !path.startsWith("/fonts") && !path.startsWith("/scripts") && !path.startsWith("/styles") && !path.startsWith("/images")) {
+                        if (!"/ads.yo".equalsIgnoreCase(path) && !"/ads.jsb".equalsIgnoreCase(path) && !"/proxy.yo".equalsIgnoreCase(path) && !"/login.yo".equalsIgnoreCase(path) && !"/logout.yo".equalsIgnoreCase(path) && !"/password.yo".equalsIgnoreCase(path) && !path.startsWith("/fonts") && !path.startsWith("/scripts") && !path.startsWith("/styles") && !path.startsWith("/images")) {
                             PageResponse prs = new PageResponse("LoginRequired", "Login Required", "");
                             try {
                                 prs.get("_redirect").value("/login.yo?returnUrl=" + URLEncoder.encode(session.uri(), "UTF-8"));

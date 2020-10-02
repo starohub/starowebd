@@ -35,7 +35,9 @@
 package jsx.webd;
 
 import com.starohub.webd.Tool;
+import jsb.SMachine;
 import jsb.io.SException;
+import jsb.webd.SPackage;
 import jsb.webd.SSession;
 
 import java.io.*;
@@ -144,5 +146,13 @@ public class Platform {
             log(e);
         }
         return resJson;
+    }
+
+    public void showAds(SMachine machine, int adsStart, int adsTime, String adsUrl) {
+        log("Ads Displayed! start: " + adsStart + ", time: " + adsTime + ", url: " + adsUrl);
+    }
+
+    public void hideAds(SMachine machine) {
+        log("Ads Hidden!");
     }
 }

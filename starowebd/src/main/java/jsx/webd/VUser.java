@@ -124,9 +124,14 @@ public class VUser {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(src.getBytes());
             byte[] digest = md.digest();
-            String myHash = DatatypeConverter
-                    .printHexBinary(digest).toUpperCase();
-            return myHash;
+            StringBuilder hexString = new StringBuilder();
+            for (byte aMessageDigest : digest) {
+                String h = Integer.toHexString(0xFF & aMessageDigest);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
         } catch (Throwable e) {
             host().blueprint().platform().log(e);
             return src;
