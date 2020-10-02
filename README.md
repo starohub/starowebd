@@ -10,7 +10,7 @@
 
 ### Release
 
-[Release 0.1.6](https://github.com/starohub/starowebd/releases/tag/0.1.6)
+[Release 0.1.7](https://github.com/starohub/starowebd/releases/tag/0.1.7)
 
 ### Maven
 
@@ -33,11 +33,11 @@
             <systemPath>${project.basedir}/lib/starodiscus.jar</systemPath>
         </dependency>
 
-        <!-- https://github.com/starohub/starojsb/releases/tag/0.1.11 -->
+        <!-- https://github.com/starohub/starojsb/releases/tag/0.1.12 -->
         <dependency>
             <groupId>com.starohub.jsb</groupId>
             <artifactId>starojsb</artifactId>
-            <version>0.1.11</version>
+            <version>0.1.12</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/starojsb.jar</systemPath>
         </dependency>
@@ -78,11 +78,11 @@
             <systemPath>${project.basedir}/lib/slf4j-simple-1.7.26.jar</systemPath>
         </dependency>
 
-        <!-- https://github.com/starohub/starowebd/releases/tag/0.1.6 -->
+        <!-- https://github.com/starohub/starowebd/releases/tag/0.1.7 -->
         <dependency>
             <groupId>com.starohub.webd</groupId>
             <artifactId>starowebd</artifactId>
-            <version>0.1.6</version>
+            <version>0.1.7</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/starowebd.jar</systemPath>
         </dependency>
