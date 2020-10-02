@@ -231,12 +231,12 @@ public class BluePrint extends jsx.webd.BluePrint {
 
         @Override
         protected boolean createCheckMAC() {
-            return true;
+            return false;
         }
 
         @Override
         protected boolean createCheckIP() {
-            return true;
+            return false;
         }
 
         @Override

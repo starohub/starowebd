@@ -12,4 +12,10 @@ public class Package extends jsb.SPackage {
     public String trial() {
         return "This is trial with license!";
     }
+
+    protected jsb.SPackage setupVisible() {
+        customVisible("com.starohub.trial.plugin.Module", false);
+        customVisible("jsb.trial.plugin.Package", false);
+        return this;
+    }
 }

@@ -16,13 +16,6 @@ public class Module extends jsb.SModule {
         return new PackageStore(this.machine(), more);
     }
 
-    public boolean visibleToScripts(String className) {
-        if (super.visibleToScripts(className)) return true;
-        if (className.startsWith("com.starohub.trial.plugin.Module")) return true;
-        if (className.startsWith("jsb.trial.plugin.Package")) return true;
-        return false;
-    }
-
     @Override
     protected PSoftware createSoftware(String licFile) {
         return new License(machine(), licFile, true);
